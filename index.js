@@ -50,6 +50,12 @@ import { installChannelCatalogVisibility } from './src/channel-visibility.js'
 import { createPushHub } from './src/push.js'
 import { rejectionFor, isLoopbackHost, connectionAdmissionView } from './src/trust.js'
 import { resolveAttributionUserAgent } from './adapter/kernel.js'
+import { buildAggregateCatalog, fetchProviderModels, isAggregateEntry, testProvider } from './src/aggregate.js'
+import { buildComboCatalog, isComboEntry, normalizeCombos, pruneRotation } from './src/combos.js'
+import { getProvider, listProviders } from './src/providers/index.js'
+import { addSavings, describeSavingsTotal, emptySavings, saverConfig, savingsPercent } from './src/token-saver/index.js'
+import { CAVEMAN_LEVELS, PONYTAIL_LEVELS } from './src/token-saver/prompts.js'
+import { OPTIMIZATIONS } from './src/local-optimize.js'
 import { createModelRuntime, createRuntimeStores } from './src/core/runtime.js'
 
 export { fromOpenAiMessages } from './src/core/completion.js'
@@ -422,7 +428,7 @@ export function apply(ctx, config) {
     onSealedUnavailable: () => logger.warn?.('our-free-model: the sealed lane is not available in this composition (no recognized host profile); its models stay hidden'),
     onTopology: () => emitTopology(),
   })
-  const { state, adapter, refreshCatalog, refreshAvailability, watchEgress, fetchListing, publicModelRows } = modelRuntime
+  const { state, adapter, refreshCatalog, refreshAvailability, watchEgress, fetchListing, publicModelRows, syncAggregateCatalog } = modelRuntime
   const runForwarded = modelRuntime.complete
 
   // ── registration ────────────────────────────────────────────────────────────
@@ -538,6 +544,10 @@ export function apply(ctx, config) {
         },
         complete: (request, onChunk) => runForwarded(request, onChunk),
         modelRows: () => publicModelRows(),
+        // Read per request, not captured: the settings page can flip a switch
+        // while the listener is up, and a captured snapshot would keep answering
+        // a disabled optimization until the next restart.
+        optimize: () => optimizeConfig(settings.get().localOptimize),
         log: message => logger.warn?.(`our-free-model forward: ${message}`),
         onTrace: event => logger.info?.(`our-free-model request: ${JSON.stringify(event)}`),
       })
@@ -1077,6 +1087,155 @@ export function apply(ctx, config) {
     refreshCatalog, refreshAvailability, syncForward, syncRelay, syncEgress,
     pool: fetchPoolSnapshot,
     eacAuth,
+    // ── the aggregate lane's settings surface ────────────────────────────────
+    // The registry is static data; the configured half is the settings file with
+    // every key masked. Writing one provider rebuilds the catalog and re-emits
+    // the topology, because a provider the picker cannot see is a provider the
+    // user cannot use, and the picker is driven by `llm/adapters-updated`.
+    providers: {
+      registry: publicProviderRegistry,
+      configured: () => publicAggregate(settings.get().aggregate),
+      save: async patch => {
+        if (patch === null || typeof patch !== 'object') throw httpError(400, 'the request body must be a JSON object')
+        const id = String(patch.providerId ?? '').trim()
+        const provider = getProvider(id)
+        if (provider === null) throw httpError(400, `unknown provider "${id}"`)
+        const section = settings.get().aggregate ?? {}
+        const providers = { ...(section.providers ?? {}) }
+        const previous = providers[id] ?? {}
+        const next = { ...previous, addedAt: Number.isFinite(previous.addedAt) && previous.addedAt > 0 ? previous.addedAt : Date.now() }
+        if (patch.enabled !== undefined) next.enabled = patch.enabled === true
+        // An absent field keeps the stored value; an empty string clears it. That
+        // is the difference between "the page did not touch the key" and "the user
+        // emptied the box", and conflating them silently kept a key the user
+        // believed they had removed.
+        if (typeof patch.apiKey === 'string') next.apiKey = patch.apiKey.trim().slice(0, 512)
+        if (typeof patch.baseUrl === 'string') {
+          const url = patch.baseUrl.trim()
+          if (url !== '' && !/^https?:\/\//i.test(url)) throw httpError(400, 'baseUrl must be an http(s) URL')
+          next.baseUrl = url.slice(0, 512)
+        }
+        if (Array.isArray(patch.models)) next.models = patch.models.map(value => String(value ?? '').trim()).filter(value => value !== '').slice(0, 300)
+        providers[id] = next
+        settings.update({ aggregate: { ...section, providers } })
+        settings.flush()
+        syncAggregateCatalog()
+        return publicAggregate(settings.get().aggregate)
+      },
+      remove: async id => {
+        const section = settings.get().aggregate ?? {}
+        const providers = { ...(section.providers ?? {}) }
+        delete providers[String(id ?? '').trim()]
+        settings.update({ aggregate: { ...section, providers } })
+        settings.flush()
+        syncAggregateCatalog()
+        return publicAggregate(settings.get().aggregate)
+      },
+      test: async id => {
+        const providerId = String(id ?? '').trim()
+        if (getProvider(providerId) === null) throw httpError(400, `unknown provider "${providerId}"`)
+        const result = await testProvider(settings.get().aggregate ?? {}, providerId)
+        // The verdict is persisted so the page can show "verified 3 minutes ago"
+        // without spending a probe on every mount. It is a reading, not a
+        // credential, so it rides the public section as-is.
+        const section = settings.get().aggregate ?? {}
+        const providers = { ...(section.providers ?? {}) }
+        if (providers[providerId] !== undefined) {
+          providers[providerId] = { ...providers[providerId], lastTest: { at: Date.now(), ok: result.ok === true, status: result.status ?? 0, message: String(result.message ?? '').slice(0, 300) } }
+          settings.update({ aggregate: { ...section, providers } })
+          settings.flush()
+        }
+        return result
+      },
+      discover: async id => {
+        const providerId = String(id ?? '').trim()
+        if (getProvider(providerId) === null) throw httpError(400, `unknown provider "${providerId}"`)
+        const ids = await fetchProviderModels(settings.get().aggregate ?? {}, providerId)
+        if (ids === null) return { models: null, note: 'this provider declares no model listing' }
+        const section = settings.get().aggregate ?? {}
+        const providers = { ...(section.providers ?? {}) }
+        if (providers[providerId] !== undefined) {
+          providers[providerId] = { ...providers[providerId], discovered: ids.slice(0, 300) }
+          settings.update({ aggregate: { ...section, providers } })
+          settings.flush()
+          syncAggregateCatalog()
+        }
+        return { models: ids }
+      },
+    },
+    // ── fallback chains ─────────────────────────────────────────────────────
+    combos: {
+      list: () => ({
+        combos: normalizeCombos(settings.get().combos),
+        // Every id a chain may reference, with the display name the picker uses —
+        // the editor offers a searchable list instead of a free-text field, so a
+        // typo cannot become a chain link that silently never resolves.
+        models: state().catalog.map(entry => ({ id: entry.id, name: entry.name, channel: entry.channel ?? 'free', vision: entry.vision === true })),
+        strategies: ['fallback', 'round-robin'],
+      }),
+      save: async patch => {
+        if (patch === null || typeof patch !== 'object') throw httpError(400, 'the request body must be a JSON object')
+        const rows = normalizeCombos(patch.combos)
+        // Stored as entered. Links that name nothing right now are kept on purpose:
+        // a chain that reaches an EAC model is still correct on a day the lane is
+        // closed, and dropping the link would quietly rewrite the user's chain.
+        settings.update({ combos: rows })
+        settings.flush()
+        const catalog = syncAggregateCatalog()
+        return { combos: rows, usable: catalog.filter(isComboEntry).map(entry => ({ id: entry.id, name: entry.name, models: entry.combo })) }
+      },
+    },
+    // ── token savers ────────────────────────────────────────────────────────
+    tokenSaver: {
+      get: () => ({ ...publicTokenSaver(settings.get().tokenSaver), savings: buildStats(stats.get(), state().catalog).savings }),
+      set: async patch => {
+        if (patch === null || typeof patch !== 'object') throw httpError(400, 'the request body must be a JSON object')
+        const current = settings.get().tokenSaver ?? {}
+        const prompts = { ...(current.prompts ?? {}) }
+        if (patch.prompts !== null && typeof patch.prompts === 'object') {
+          if (patch.prompts.caveman !== undefined) {
+            const level = String(patch.prompts.caveman)
+            if (!CAVEMAN_LEVELS.includes(level)) throw httpError(400, `caveman level must be one of ${CAVEMAN_LEVELS.join(', ')}`)
+            prompts.caveman = level
+          }
+          if (patch.prompts.ponytail !== undefined) {
+            const level = String(patch.prompts.ponytail)
+            if (!PONYTAIL_LEVELS.includes(level)) throw httpError(400, `ponytail level must be one of ${PONYTAIL_LEVELS.join(', ')}`)
+            prompts.ponytail = level
+          }
+        }
+        settings.update({ tokenSaver: {
+          ...current,
+          prompts,
+          ...patch.enabled === undefined ? {} : { enabled: patch.enabled === true },
+          ...patch.rtk === undefined ? {} : { rtk: patch.rtk === true },
+        } })
+        settings.flush()
+        return publicTokenSaver(settings.get().tokenSaver)
+      },
+    },
+    // ── the five local answers ──────────────────────────────────────────────
+    localOptimize: {
+      get: () => publicLocalOptimize(settings.get().localOptimize),
+      set: async patch => {
+        if (patch === null || typeof patch !== 'object') throw httpError(400, 'the request body must be a JSON object')
+        const current = settings.get().localOptimize ?? {}
+        const next = { ...current }
+        if (patch.enabled !== undefined) next.enabled = patch.enabled === true
+        for (const kind of OPTIMIZATION_KINDS) if (patch[kind] !== undefined) next[kind] = patch[kind] === true
+        settings.update({ localOptimize: next })
+        settings.flush()
+        return publicLocalOptimize(settings.get().localOptimize)
+      },
+    },
+    // Connection recipes for the local gateway, generated from the live port and
+    // key so the page never shows a stale address after a port fallback.
+    clients: () => clientSnippets({
+      forward: { running: forward !== null, port: forward?.port ?? 0, lan: { running: relay !== null, port: relay?.port ?? 0, addresses: lanAddresses() } },
+      key: settings.get().forwardKey ?? '',
+      lanKey: settings.get().forwardLanKey ?? '',
+      models: publicModelRows().map(row => row.id),
+    }),
     // The absorbed channel pack's liveness, for the 白嫖接入 page: the page
     // renders its channel grid from this bit plus the pack's own RPC.
     channels: () => channelPack,
@@ -1585,6 +1744,60 @@ function createApiRoutes(deps) {
       if (method === 'GET' && routePath === '/outlet') {
         return send(200, await deps.outletStatus())
       }
+      // ── the aggregate lane ─────────────────────────────────────────────────
+      if (method === 'GET' && routePath === '/providers') {
+        const id = url.searchParams.get('id')
+        if (id !== null && id !== '') {
+          const provider = getProvider(id)
+          if (provider === null) return send(404, { error: `unknown provider "${id}"` })
+          return send(200, { provider, configured: publicAggregate(deps.settings.get().aggregate).providers[id] ?? null })
+        }
+        return send(200, { registry: deps.providers.registry(), configured: deps.providers.configured() })
+      }
+      if (method === 'POST' && routePath === '/providers') {
+        const body = await readJson(req)
+        return send(200, { ok: true, aggregate: await deps.providers.save(body) })
+      }
+      if (method === 'POST' && routePath === '/providers/remove') {
+        const body = await readJson(req)
+        return send(200, { ok: true, aggregate: await deps.providers.remove(body?.providerId) })
+      }
+      if (method === 'POST' && routePath === '/providers/test') {
+        const body = await readJson(req)
+        return send(200, await deps.providers.test(body?.providerId))
+      }
+      if (method === 'POST' && routePath === '/providers/discover') {
+        const body = await readJson(req)
+        return send(200, await deps.providers.discover(body?.providerId))
+      }
+      // ── fallback chains ────────────────────────────────────────────────────
+      if (method === 'GET' && routePath === '/combos') {
+        return send(200, deps.combos.list())
+      }
+      if (method === 'POST' && routePath === '/combos') {
+        const body = await readJson(req)
+        return send(200, { ok: true, ...await deps.combos.save(body) })
+      }
+      // ── token savers ───────────────────────────────────────────────────────
+      if (method === 'GET' && routePath === '/token-saver') {
+        return send(200, deps.tokenSaver.get())
+      }
+      if (method === 'POST' && routePath === '/token-saver') {
+        const body = await readJson(req)
+        return send(200, { ok: true, tokenSaver: await deps.tokenSaver.set(body) })
+      }
+      // ── the five local answers ─────────────────────────────────────────────
+      if (method === 'GET' && routePath === '/local-optimize') {
+        return send(200, deps.localOptimize.get())
+      }
+      if (method === 'POST' && routePath === '/local-optimize') {
+        const body = await readJson(req)
+        return send(200, { ok: true, localOptimize: await deps.localOptimize.set(body) })
+      }
+      // ── connection recipes ─────────────────────────────────────────────────
+      if (method === 'GET' && routePath === '/clients') {
+        return send(200, deps.clients())
+      }
       if (method === 'GET' && routePath === '/meta') {
         return send(200, { ...deps.meta(), feed: { fetchedAt: deps.announcements.view().fetchedAt, source: deps.announcements.view().source, error: deps.announcements.view().error }, update: deps.update.status() })
       }
@@ -1840,6 +2053,209 @@ async function readJson(req) {
   }
 }
 
+
+/**
+ * The token-saver section as the browser may see it.
+ *
+ * Normalized rather than echoed: a stored level id that is not in the family's
+ * list would otherwise reach a `<select>` with no matching option and render as
+ * "off" while the pipeline was still using something else.
+ */
+function publicTokenSaver(section) {
+  const config = saverConfig({ tokenSaver: section })
+  return {
+    enabled: config.enabled,
+    rtk: config.rtk,
+    prompts: { caveman: config.caveman, ponytail: config.ponytail },
+    cavemanLevels: CAVEMAN_LEVELS,
+    ponytailLevels: PONYTAIL_LEVELS,
+  }
+}
+
+/**
+ * The aggregate section with every key replaced by a fingerprint.
+ *
+ * A provider key is a bearer credential for somebody else's account — the one
+ * thing in this document that must never be echoed. It stays in the 0600
+ * settings file; `hasKey` plus the last four characters are all the panel needs
+ * to tell "configured" from "not configured" and to let a user recognise which
+ * key is stored. The value itself is served only to the page that set it, and
+ * only as a mask.
+ */
+function publicAggregate(section) {
+  const providers = section?.providers ?? {}
+  const out = {}
+  for (const [id, value] of Object.entries(providers)) {
+    if (value === null || typeof value !== 'object') continue
+    const key = typeof value.apiKey === 'string' ? value.apiKey : ''
+    out[id] = {
+      enabled: value.enabled !== false,
+      hasKey: key !== '',
+      keyHint: key === '' ? '' : `…${key.slice(-4)}`,
+      baseUrl: typeof value.baseUrl === 'string' ? value.baseUrl : '',
+      models: Array.isArray(value.models) ? value.models : [],
+      discovered: Array.isArray(value.discovered) ? value.discovered : [],
+      addedAt: Number.isFinite(value.addedAt) ? value.addedAt : 0,
+      lastTest: value.lastTest ?? null,
+    }
+  }
+  return { enabled: section?.enabled !== false, providers: out }
+}
+
+/** The provider registry, compact enough for one settings page to hold. */
+function publicProviderRegistry() {
+  return listProviders().map(provider => ({
+    id: provider.id,
+    name: provider.name,
+    category: provider.category,
+    authKind: provider.auth?.kind ?? 'apiKey',
+    credentialUrl: provider.auth?.url ?? '',
+    baseUrl: provider.baseUrl ?? '',
+    baseUrlOverrideEnv: provider.baseUrlOverrideEnv ?? '',
+    format: provider.format,
+    website: provider.website ?? '',
+    notes: provider.notes ?? '',
+    local: provider.local === true,
+    modelCount: Array.isArray(provider.models) ? provider.models.length : 0,
+    models: (Array.isArray(provider.models) ? provider.models : []).map(model => ({
+      id: model.id,
+      name: model.name ?? model.id,
+      contextWindow: model.contextWindow ?? null,
+      vision: model.vision === true,
+      reasoning: model.reasoning === true,
+    })),
+  }))
+}
+
+/** The five local answers, in evaluation order. */
+const OPTIMIZATION_KINDS = OPTIMIZATIONS
+
+/**
+ * The local-optimization switches as the browser may see them.
+ *
+ * Each kind is reported individually even when the section is off, because the
+ * page shows five separate switches: a master switch that silently blanked them
+ * would look like the per-kind values had been lost.
+ */
+function publicLocalOptimize(section) {
+  const config = section ?? {}
+  const out = { enabled: config.enabled !== false }
+  for (const kind of OPTIMIZATION_KINDS) out[kind] = config[kind] !== false
+  return out
+}
+
+/** The switches in the shape `tryOptimizations` wants. */
+function optimizeConfig(section) {
+  const publicView = publicLocalOptimize(section)
+  return publicView.enabled === true ? publicView : null
+}
+
+/**
+ * Connection recipes for the local gateway.
+ *
+ * Generated rather than stored: the port can move when the requested one is
+ * taken, so a snippet baked into the page at mount time is a snippet that lies
+ * after a restart. Everything here is derived from what the listeners actually
+ * bound and the keys they actually demand.
+ */
+function clientSnippets({ forward, key, lanKey, models }) {
+  const running = forward.running === true
+  const base = running ? `http://127.0.0.1:${forward.port}` : 'http://127.0.0.1:<forward-port>'
+  const lanAddress = forward.lan.running === true && forward.lan.addresses.length > 0
+    ? `http://${forward.lan.addresses[0]}:${forward.lan.port}`
+    : ''
+  const shownKey = key === '' ? '<forward-key>' : key
+  const shownLanKey = lanKey === '' ? '<lan-key>' : lanKey
+  const sample = models[0] ?? 'deepseek-v4-flash-free'
+  const snippets = [
+    {
+      id: 'claude-code',
+      name: 'Claude Code',
+      language: 'bash',
+      body: [
+        `export ANTHROPIC_BASE_URL=${base}`,
+        `export ANTHROPIC_AUTH_TOKEN=${shownKey}`,
+        `export ANTHROPIC_MODEL=${sample}`,
+        '# the gateway speaks /v1/messages natively — no translation shim needed',
+      ].join('\n'),
+    },
+    {
+      id: 'codex',
+      name: 'Codex CLI',
+      language: 'toml',
+      body: [
+        '# ~/.codex/config.toml',
+        'model_provider = "ofm"',
+        `model = "${sample}"`,
+        '',
+        '[model_providers.ofm]',
+        'name = "Our Free Model"',
+        `base_url = "${base}/v1"`,
+        'wire_api = "responses"',
+        `env_key = "OFM_API_KEY"`,
+      ].join('\n'),
+    },
+    {
+      id: 'openai-sdk',
+      name: 'OpenAI SDK / any OpenAI-compatible tool',
+      language: 'python',
+      body: [
+        'from openai import OpenAI',
+        `client = OpenAI(base_url="${base}/v1", api_key="${shownKey}")`,
+        `client.chat.completions.create(model="${sample}", messages=[{"role": "user", "content": "hi"}])`,
+      ].join('\n'),
+    },
+    {
+      id: 'anthropic-sdk',
+      name: 'Anthropic SDK',
+      language: 'python',
+      body: [
+        'from anthropic import Anthropic',
+        `client = Anthropic(base_url="${base}", api_key="${shownKey}")`,
+        `client.messages.create(model="${sample}", max_tokens=1024, messages=[{"role": "user", "content": "hi"}])`,
+      ].join('\n'),
+    },
+    {
+      id: 'curl',
+      name: 'curl',
+      language: 'bash',
+      body: [
+        `curl ${base}/v1/chat/completions \\`,
+        `  -H "authorization: Bearer ${shownKey}" \\`,
+        '  -H "content-type: application/json" \\',
+        `  -d '{"model":"${sample}","messages":[{"role":"user","content":"hi"}]}'`,
+        '',
+        '# the Anthropic surface answers on the same port:',
+        `curl ${base}/v1/messages \\`,
+        `  -H "x-api-key: ${shownKey}" \\`,
+        '  -H "anthropic-version: 2023-06-01" \\',
+        '  -H "content-type: application/json" \\',
+        `  -d '{"model":"${sample}","max_tokens":1024,"messages":[{"role":"user","content":"hi"}]}'`,
+      ].join('\n'),
+    },
+  ]
+  if (lanAddress !== '') {
+    snippets.push({
+      id: 'lan',
+      name: 'Another device on your network',
+      language: 'bash',
+      body: [
+        `# the LAN relay is up on this machine; its key is not the local one`,
+        `export OPENAI_BASE_URL=${lanAddress}/v1`,
+        `export OPENAI_API_KEY=${shownLanKey}`,
+      ].join('\n'),
+    })
+  }
+  return {
+    running,
+    baseUrl: base,
+    lanUrl: lanAddress,
+    key: shownKey,
+    models,
+    snippets,
+  }
+}
+
 function publicSettings(settings, forwardInfo, egressInfo) {
   return {
     enabled: settings.enabled !== false,
@@ -1855,6 +2271,16 @@ function publicSettings(settings, forwardInfo, egressInfo) {
     autoReloadWatch: settings.autoReloadWatch === true,
     reloadedAt: settings.reloadedAt ?? 0,
     reloadCount: settings.reloadCount ?? 0,
+    tokenSaver: publicTokenSaver(settings.tokenSaver),
+    aggregate: publicAggregate(settings.aggregate),
+    combos: normalizeCombos(settings.combos).map(combo => ({
+      id: combo.id,
+      name: combo.name,
+      models: combo.models,
+      strategy: combo.strategy,
+      stickyLimit: combo.stickyLimit,
+      enabled: combo.enabled,
+    })),
     forward: {
       ...(settings.forward ?? {}),
       running: forwardInfo.running,
@@ -1901,16 +2327,19 @@ function buildSummary(deps) {
   const update = deps.update.status()
   const feedView = deps.announcements.view()
   const defaultMaxTokens = deps.settings.get().defaultMaxTokens
+  // Lanes that carry no availability verdict of their own. The absorbed channels
+  // and the aggregate lane are named by a listing round that already succeeded,
+  // and a combo is a view over rows that were themselves named — none of them is
+  // pinged, so "no verdict" must not render as "unknown".
+  const unprobed = entry => isEacEntry(entry) || isKiloEntry(entry) || isAggregateEntry(entry) || isComboEntry(entry)
   return {
     catalog: state.catalog.map(entry => ({
       ...entry,
-      // The absorbed channels are not probed: their presence in the roster is
-      // the verdict — the listing round named them after the round succeeded.
-      availability: isEacEntry(entry) || isKiloEntry(entry) ? STATE.available : (snapshot.results?.[entry.id]?.state ?? STATE.unknown),
-      detail: isEacEntry(entry) || isKiloEntry(entry) ? '' : (snapshot.results?.[entry.id]?.detail ?? ''),
-      probedAt: isEacEntry(entry) || isKiloEntry(entry) ? 0 : (snapshot.results?.[entry.id]?.at ?? 0),
-      ttftMs: isEacEntry(entry) || isKiloEntry(entry) ? undefined : snapshot.results?.[entry.id]?.ttftMs,
-      latencyMs: isEacEntry(entry) || isKiloEntry(entry) ? undefined : snapshot.results?.[entry.id]?.latencyMs,
+      availability: unprobed(entry) ? STATE.available : (snapshot.results?.[entry.id]?.state ?? STATE.unknown),
+      detail: unprobed(entry) ? '' : (snapshot.results?.[entry.id]?.detail ?? ''),
+      probedAt: unprobed(entry) ? 0 : (snapshot.results?.[entry.id]?.at ?? 0),
+      ttftMs: unprobed(entry) ? undefined : snapshot.results?.[entry.id]?.ttftMs,
+      latencyMs: unprobed(entry) ? undefined : snapshot.results?.[entry.id]?.latencyMs,
       // What each rung of the effort menu will really put on the wire for this
       // model, so the page never shows a 32K "output ceiling" beside a call that
       // was cut off at 8K. A model with no effort menu has no ladder to show.

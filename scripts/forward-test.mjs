@@ -169,6 +169,63 @@ await checkAsync('a decoy tool call never reaches the streaming client', async (
   assert.deepEqual(finish, ['stop'], `a suppressed-only turn must not finish as tool_calls, got ${finish}`)
 })
 
+// Measured live: the token saver compacts a diff, appends the filter's own
+// `[full diff: … --no-compact]` hint, the model obeys it by calling `bash`, and a
+// caller that declared no tools has that call suppressed. Suppressing it is right;
+// reporting the turn as a clean empty success is not — `finish_reason: stop` with
+// `content: null` is indistinguishable from "the model said nothing", and it sent
+// a live verification run hunting for a bug in the model instead of in the
+// transcript. Both surfaces must say what actually happened.
+await checkAsync('a turn whose only output was a suppressed call is reported, not answered empty', async () => {
+  // A guarded lane, not `makeLane`: the non-streaming path calls `complete`
+  // without an `onChunk`, and the shared helper forwards chunks unconditionally.
+  const outcome = { text: '', toolCalls: [{ slot: 0, id: 'call_s', name: 'bash', arguments: '{"command":"git diff --no-compact"}' }] }
+  const lane = {
+    complete: async (request, onChunk) => {
+      if (typeof onChunk === 'function') {
+        for (const chunk of [
+          { type: 'tool-call-delta', index: 0, id: 'call_s', name: 'bash', argumentsDelta: '{"command":"git diff --no-compact"}' },
+          { type: 'block-end', index: 0, block: { type: 'tool-call', id: 'call_s', name: 'bash', arguments: '{"command":"git diff --no-compact"}' } },
+          { type: 'finish', reason: { kind: 'tool-calls' } },
+        ]) onChunk(chunk)
+      }
+      return outcome
+    },
+  }
+  const base = await serve(lane)
+  const streamed = await authFetch(base, '/v1/chat/completions', { model: 'mimo-v2.6-flash-free', stream: true })
+  const body = await streamed.text()
+  assert.deepEqual(toolCallDeltas(body), [], 'the undeclared call still must not reach the client')
+  const error = sseFrames(body).map(frame => frame.error?.message).find(Boolean)
+  assert.ok(typeof error === 'string' && error.includes('bash'), `the stream must name the call it suppressed, got ${JSON.stringify(error)}`)
+  const finish = sseFrames(body).map(frame => frame.choices?.[0]?.finish_reason).filter(Boolean)
+  assert.deepEqual(finish, [], 'a turn reported as failed carries no clean finish frame')
+
+  const plain = await authFetch(base, '/v1/chat/completions', { model: 'mimo-v2.6-flash-free' })
+  assert.equal(plain.status, 502, 'the non-streaming surface reports it as a failure too')
+  const payload = JSON.parse(await plain.text())
+  assert.ok(String(payload.error?.message ?? '').includes('bash'), `got ${JSON.stringify(payload)}`)
+})
+
+// The counter-case, so the note cannot swallow a legitimate truncation: a cut
+// tool call whose arguments never closed is `length`, not "you did not declare it".
+await checkAsync('a ceiling cut is still reported as length, not as a missing tool', async () => {
+  const lane = makeLane()
+  const base = await serve(lane)
+  lane.script = () => ({
+    chunks: [
+      { type: 'tool-call-delta', index: 0, id: 'call_c', name: 'bash', argumentsDelta: '{"command":"git diff"' },
+      { type: 'finish', reason: { kind: 'max-tokens' } },
+    ],
+    outcome: { text: '', toolCalls: [{ slot: 0, id: 'call_c', name: 'bash', arguments: '{"command":"git diff"' }], truncated: true },
+  })
+  const response = await authFetch(base, '/v1/chat/completions', { model: 'mimo-v2.6-flash-free', stream: true })
+  const frames = sseFrames(await response.text())
+  const finish = frames.map(frame => frame.choices?.[0]?.finish_reason).filter(Boolean)
+  assert.deepEqual(finish, ['length'], `got ${finish}`)
+  assert.deepEqual(frames.map(frame => frame.error?.message).filter(Boolean), [], 'a ceiling cut is not an error frame')
+})
+
 await checkAsync('a ceiling-cut tool call finishes as length on the stream', async () => {
   const lane = makeLane()
   const base = await serve(lane)

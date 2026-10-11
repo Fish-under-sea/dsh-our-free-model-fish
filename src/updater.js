@@ -257,15 +257,23 @@ async function snapshotManifestSource(source, fetchImpl, signal, revisions) {
   if (revision === undefined) {
     const response = await fetchImpl(`https://api.github.com/repos/${REPO}/commits/${encodeURIComponent(ref)}`, {
       redirect: 'error', signal,
-      headers: { accept: 'application/vnd.github+json', 'user-agent': 'our-free-model-updater' },
+      // `application/vnd.github.sha` answers with the bare 40-character SHA. The
+      // default JSON envelope carries the commit's full patch list, and a merge
+      // that touched hundreds of files pushes that document past
+      // MAX_MANIFEST_BYTES — for a payload whose only consumed field is `.sha`
+      // — which failed every update check against exactly the releases a big
+      // merge produced (v2.1.0's own merge commit). The JSON spelling stays as
+      // a fallback for a hop that rewrote the Accept header.
+      headers: { accept: 'application/vnd.github.sha', 'user-agent': 'our-free-model-updater' },
     })
     if (!response.ok) throw new Error(`snapshot resolution failed for ${ref}: HTTP ${response.status}`)
-    const text = await response.text()
+    const text = (await response.text()).trim()
     if (text.length > MAX_MANIFEST_BYTES) throw new Error('snapshot resolution response too large')
-    revision = JSON.parse(text)?.sha
-    if (typeof revision !== 'string' || !/^[a-f0-9]{40}$/.test(revision)) {
+    const sha = /^[a-f0-9]{40}$/.test(text) ? text : JSON.parse(text)?.sha
+    if (typeof sha !== 'string' || !/^[a-f0-9]{40}$/.test(sha)) {
       throw new Error(`snapshot resolution did not return a full commit SHA for ${ref}`)
     }
+    revision = sha
     revisions.set(ref, revision)
   }
   url.pathname = `${prefix}${revision}/feed/manifest.json`

@@ -171,6 +171,33 @@ await checkAsync('raw failure falls back to CDN at the same SHA without re-resol
   assert.equal(fixture.calls.some(call => call.url === rawSource || call.url === cdnSource), false)
 })
 
+// The resolver asks GitHub for the bare-SHA media type: the default JSON
+// envelope carries the commit's full patch list, and a big merge's envelope
+// blew past the snapshot size cap — every update check failed against exactly
+// the releases a big merge produced. The bare spelling must be requested and
+// parsed; the JSON envelope stays accepted for a hop that rewrote the header.
+await checkAsync('snapshot resolution requests the bare-SHA media type', async () => {
+  const fixture = snapshotFetch()
+  await downloadManifest([rawSource], { fetchImpl: fixture.fetchImpl, verifyKey: TEST_PUBLIC_KEY })
+  const resolverCall = fixture.calls.find(call => call.url === resolverUrl)
+  assert.equal(resolverCall.options.headers.accept, 'application/vnd.github.sha')
+})
+
+await checkAsync('a bare-SHA resolver answer resolves without the JSON envelope', async () => {
+  const calls = []
+  const bareFetch = async (url, options) => {
+    const parsed = new URL(url)
+    parsed.search = ''
+    calls.push({ url: parsed.href, options })
+    if (parsed.href === resolverUrl) return new Response(SNAPSHOT, { status: 200 })
+    if (parsed.href === rawSnapshot) return new Response(JSON.stringify(newManifest))
+    return new Response('not found', { status: 404 })
+  }
+  const result = await downloadManifest([rawSource], { fetchImpl: bareFetch, verifyKey: TEST_PUBLIC_KEY })
+  assert.equal(result.source, rawSnapshot)
+  assert.equal(calls.find(call => call.url === resolverUrl).options.headers.accept, 'application/vnd.github.sha')
+})
+
 for (const source of [rawSnapshot, cdnSnapshot, 'https://mirror.example/repo/feed/manifest.json', 'http://127.0.0.1:18999/feed/manifest.json']) {
   await checkAsync(`immutable and custom sources need no resolver (${new URL(source).hostname})`, async () => {
     const fixture = snapshotFetch({ source })

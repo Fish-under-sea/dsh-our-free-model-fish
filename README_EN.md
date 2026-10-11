@@ -52,6 +52,11 @@
 - **OpenAI-compatible forward port** — expose these models to any other local tool through a base URL plus a generated API key.
 - **EAC lane (desktop hosts)** — a co-paid lane that unlocks in the DeepSeek Harness desktop app and DSHEAC AIO, with models prefixed `EAC`; its credential is sealed and guarded by a host-fingerprint gate, and turns are checked server-side against a GitHub authorization (sign in and star the repository). It does not exist in the CLI or any other host.
 - **The Kilo channel (keyless free pool)** — the free model pool of Kilo AI's public gateway (the listing's `isFree` slice, fetched live, including the `kilo-auto/free` auto-router) is built in; no account, no key. Model cards carry a Kilo badge. Thinking effort works like the EAC lane: the model's own level menu (Off / Low / Medium / High, default High), sent for real through the gateway's unified `reasoning` parameter — Off was verified family by family to zero out thinking (nemotron, ling, dots, poolside, apodex, cohere); the stepfun and liquid endpoints refuse to disable thinking (HTTP 400) and the two auto-routers ignore it, so those models' menus omit the Off rung. The pool is the upstream's free offer, and its model cards state that prompts may be logged to improve their services — never send sensitive content; see the [Disclaimer](#disclaimer).
+- **The aggregate lane — your own key, 76 providers** — a new settings tab brings third-party endpoints into the same roster: the registry ships 76 providers (NVIDIA NIM, OpenRouter, Groq, Cerebras, SambaNova, Gemini, DeepSeek, Mistral, Together, Fireworks, SiliconFlow, Nebius, Chutes, Hugging Face, Cloudflare, Z.ai, Kimi, MiniMax, QwenCloud/Alibaba, Bedrock, Vertex, Vercel AI Gateway, Azure OpenAI, plus the no-account Ollama, LM Studio and llama.cpp). Configuring a provider (a key for the ones that need one; the local no-account ones need none) turns each of its models into a `provider/model` row in the picker and on the local gateway. Keys stay in the local `0600` settings.json; the API echoes only `hasKey` and a `…abcd` fingerprint. Per provider: enable/disable, Test (a *listing* probe — it verifies a key without spending a generation), Discover, a base-URL override, a model-list override and Remove. OAuth/ADC providers are listed but marked not drivable here.
+- **Token savers** — three things: tool-output compaction (RTK) rewrites `tool_result` content in place before the request is sent (git diff / status / log, grep, find, ls, tree, build logs, numbered file dumps, search listings, duplicate log lines) — measured live, a 40 KB `git diff` lost 90% of its bytes and the model still answered about it; prompt shaping offers the caveman and ponytail families, every level off by default; and five local answers that never call a provider. The settings page reports bytes before/after, percent saved, blocks compacted and calls measured, from the same stats rows the usage charts read.
+- **Routing (fallback chains)** — chain models from any lane into one named chain that appears in the picker and on the gateway as the virtual model `combo:<name>`. `fallback` always starts at the head; `round-robin` rotates the starting point and stays there for N turns. A link that fails *before any answer delta* is discarded whole, so the switch is invisible to the caller — and reasoning deltas deliberately do not count as content, so "thought for a minute, then hit a quota wall" is the case failover exists for.
+- **The local gateway speaks Anthropic natively** — new `POST /v1/messages` (streaming and non-streaming, with `thinking`/`tool_use` blocks, a real `stop_reason` and an in-stream `error` event when a turn fails after the headers went out) and `POST /v1/messages/count_tokens` (a local estimate — the plugin ships no tokenizer); `/v1/models` now advertises every lane, the aggregate rows and the chains included. The gateway page's new *Connect a client* section generates copy-ready recipes — Claude Code, Codex `config.toml`, the OpenAI and Anthropic SDKs, curl, and a LAN variant when the relay is up — from the port that actually bound and the key that is actually required.
+- **Nine tabs beside the old six** — Aggregate, Token savers and Routing join Free models, EAC models, Free channels, Dashboard, Request log and Gateway; the motion pass (card rise on mount, page fade on tab switch, an animated savings meter, hover lifts) respects `prefers-reduced-motion` and collapses to one column at panel width.
 - **Clean names in the UI** — no mojibake, no upstream vendor strings leaking into your model picker.
 
 ## What you get
@@ -107,7 +112,7 @@ To install manually as a real directory, in `<DSH_HOME>/profiles/<profile>/`:
 
 1. Copy the published files into `node_modules/dsh-our-free-model/`
    (`index.js`, `client.js`, `adapter/`, `src/`, `locale/`, `icon.svg`, `cordis.patch.yml`, `package.json` — do not skip `adapter/`: `index.js` imports it on the first line)
-2. Add `"dsh-our-free-model": "1.5.0"` to `dependencies` — that number **tracks the repo's `package.json` `version`** (bump it together; 1.5.0 as of this line), never copy a stale one, and a version spec, not `link:`
+2. Add `"dsh-our-free-model": "2.1.0"` to `dependencies` — that number **tracks the repo's `package.json` `version`** (bump it together; 2.1.0 as of this line), never copy a stale one, and a version spec, not `link:`
 3. Append `"dsh-our-free-model"` to `dsh.profile.bundles`
 
 > Do **not** also add an entry to `cordis.patch.yml`. A bundle referenced from
@@ -181,8 +186,10 @@ it, then copy the base URL and generate a key. Supported routes:
 
 ```text
 GET  /v1/models
-POST /v1/chat/completions     streaming and non-streaming
+POST /v1/chat/completions        streaming and non-streaming
 POST /v1/responses
+POST /v1/messages                streaming and non-streaming (Anthropic Messages)
+POST /v1/messages/count_tokens   local estimate; the plugin ships no tokenizer
 ```
 
 If another program holds the port, the listener does not die: it retries the same
@@ -282,6 +289,36 @@ also get system-level toasts.
 (download → verify → backup → replace → hot reload); no reinstall, no restart.
 A failed upgrade restores the previous version and reports why.
 
+## The aggregate lane, token savers, routing and the local gateway
+
+### The aggregate lane: bring your own key for 76 providers
+
+The **Aggregate** tab brings third-party endpoints into the same roster. The provider registry ships 76 entries (`src/providers/registry.json`, categorised `free | free-tier | apikey | oauth | local`): NVIDIA NIM, OpenRouter, Groq, Cerebras, SambaNova, Gemini, DeepSeek, Mistral, Together, Fireworks, SiliconFlow, Nebius, Chutes, Hugging Face, Cloudflare, Z.ai, Kimi, MiniMax, QwenCloud/Alibaba, Bedrock, Vertex, Vercel AI Gateway, Azure OpenAI, and the local no-account ones — Ollama, LM Studio and llama.cpp. The data comes from free-claude-code's provider catalogue and 9router's provider registry.
+
+Once a provider is configured (a key for the ones that need one; the local no-account ones need none), each of its models becomes a catalog row named `provider/model`: selectable in the model picker and dialable through the local gateway. A provider's own wire format decides how it is served — OpenAI Chat Completions, OpenAI Responses, or Anthropic Messages (the last two for the providers that only speak those).
+
+Keys live only in the plugin's own `0600` `settings.json`, and the API never echoes them: the page shows `hasKey` plus a `…abcd` fingerprint. An absent field keeps the stored key; an empty string clears it. Per provider the page offers enable/disable, a Test button, a Discover button, a base-URL override (needed for Azure, Cloudflare and Vertex, which have no usable default), a model-list override and Remove. Test is a *listing* probe — it verifies a key through the provider's model listing without spending a generation, and says so when the provider declares no listing. Providers whose auth is OAuth or ADC (Google ADC) are listed but marked *not drivable* here, because this lane cannot complete those flows.
+
+### Token savers: tool-output compaction, prompt shaping and local answers
+
+**Tool-output compaction (RTK)** rewrites `tool_result` / `role:"tool"` content in place before the request is sent: git diff, git status, git log, grep, find, ls, tree, build and package-manager logs, numbered file dumps, Cursor search listings, and runs of duplicate log lines. Measured live: a 40 KB `git diff` lost 90% of its bytes and the model still answered about the diff. The safety rules: error tool results are never touched, bodies below a size floor are left alone, the replacement is never larger than the input, a filter that throws passes the original through, and the pass is idempotent. It applies to every lane, the local gateway included, and is on by default.
+
+**Prompt shaping** offers two families with levels — `caveman` (terse replies: `off/lite/full/ultra/wenyan-lite/wenyan/wenyan-ultra`) and `ponytail` (YAGNI-minimal replies: `off/lite/full/ultra`). They change how the assistant talks, so every level starts `off`. Injection is idempotent and format-aware (a system message on chat, Anthropic's `system` including the block-array form and inserted before the last `cache_control`, `instructions`/input item on Responses), and it is reversible.
+
+**The savings dashboard** shows bytes before → after, bytes saved, percent, blocks compacted and the number of calls measured — read from the same stats rows the usage charts use.
+
+**Five local answers** (ported from free-claude-code, each individually switchable, all on by default) never call a provider: a quota probe (`max_tokens:1` plus "quota" → `Quota check passed.`), shell command-prefix detection (`<policy_spec>` plus `Command:` → the prefix, refusing command injection), session-title generation (→ `Conversation`), suggestion mode (→ the empty string) and filepath extraction (→ a `<filepaths>` block). The local gateway answers them in-process.
+
+### Routing: named fallback chains (combos)
+
+A named, ordered list of model ids across every lane, which appears in the picker and on the gateway as `combo:<name>` — a virtual model. Two strategies: `fallback` (always start at the head) and `round-robin` (rotate the starting point, sticky for N turns). The chain walks its links until one produces output; a link that fails *before any content delta* is discarded whole, so the switch is invisible to the caller. Reasoning deltas deliberately do not count as content — "thought for a minute, then hit a quota wall" is the highest-value case to fail over. Once an answer delta has been delivered, a later failure ends the turn normally (the single-model checkpoint recovery still gets its continuation attempt first). Capacities are the intersection of the links (a chain advertises vision only if every link has it, and the smallest context window), and a chain whose links are all currently unavailable is stored and marked not usable rather than silently dropped.
+
+### The local gateway: a native Anthropic surface and connect recipes
+
+Two new endpoints: `POST /v1/messages` (streaming and non-streaming, with correct `message_start` / `content_block_*` / `message_delta` / `message_stop` framing, `thinking` blocks, `tool_use` blocks, a real `stop_reason`, and an in-stream `error` event when a turn fails after the headers went out) and `POST /v1/messages/count_tokens` (a documented local estimate — the plugin ships no tokenizer). Claude Code and the Anthropic SDKs can therefore point straight at the plugin. The existing `/v1/chat/completions` and `/v1/responses` are unchanged, and `/v1/models` now advertises every lane, the aggregate rows and the chains included. A new *Connect a client* section on the gateway page renders ready-to-copy recipes generated from the port that actually bound and the key that is actually required: Claude Code environment variables, Codex `config.toml`, the OpenAI SDK, the Anthropic SDK, curl, and a LAN variant when the relay is up.
+
+One false success was fixed along the way: a turn whose only output was a tool call the caller never declared used to answer as a clean empty success; it now reports what happened, because the token saver's own `[full diff: rtk git diff --no-compact]` hint can make a model ask for a tool the caller does not have.
+
 ## How it works
 
 ```text
@@ -298,7 +335,23 @@ src/stream.js   three wire decoders (chat / messages / responses) normalised to
                 harness StreamChunks, with disjoint token accounting
 src/messages.js harness messages -> wire shapes, plus tool-pairing repair
 src/effort.js   effort level -> output budget
-src/forward.js  standalone OpenAI-compatible listener
+src/forward.js  standalone OpenAI-compatible listener (plus the Anthropic Messages endpoints)
+src/providers/registry.json aggregate-lane registry: 76 providers, category, auth, wire
+                format and endpoints
+src/providers/index.js registry access and provider/model composite id parsing
+src/aggregate.js aggregate lane: catalog rows, credential resolution, key redaction,
+                listing probes, per-wire posting
+src/anthropic.js Anthropic Messages codec for /v1/messages, plus the local token estimate
+src/token-saver/index.js compaction pipeline: prompt injection -> tool-output compaction,
+                byte accounting, fail-open
+src/token-saver/inject.js idempotent injection and stripping on the chat / messages /
+                responses wires
+src/token-saver/prompts.js the caveman and ponytail prompt families and their levels
+src/token-saver/rtk/ tool-output filters: git diff/status/log, grep, find, ls, tree,
+                build logs, numbered dumps, search listings, duplicate log lines
+src/local-optimize.js the five local answers: quota, prefix, title, suggestion, filepath
+src/combos.js fallback chains: virtual catalog rows, two strategies, intersected capacities
+src/route/classify.js one failure vocabulary and cooldown policy for every lane
 src/trust.js    request trust fence for the plugin's routes (connection bridge
                 + structural fallback)
 src/push.js     SSE push hub: arrivals, update availability, upgrade done
@@ -316,6 +369,8 @@ Design decisions worth knowing:
 - **One adapter, two provider routes.** The harness groups the model picker strictly by provider route, and the catalog wire has no group/tag/badge field. Publishing a second route is therefore the only way to render a separate `region-limited` heading — and because the client drops empty groups, the two collapse into one automatically once geography stops blocking.
 - **Structural adapter, no `@deepseek-ai/dsh-llm` import.** The kernel never checks `instanceof`, so the adapter is duck-typed. This keeps the plugin from pinning itself to one kernel version and is what lets the same code run on both 0.1.5 and 0.1.7.
 - **Own JSON store instead of the settings seam.** The settings registration API differs between kernels; a private JSON store under `DSH_HOME` behaves identically on both and keeps the forward key in a `0600` file that never enters any shared settings document.
+- **The token savers run on the single choke point, and they fail open.** Prompt injection and tool-output compaction run after every other mutation has been applied — the fingerprint rename, the effort patch, the sealed lane's pacing hint — at `payloadFor()`, the one place both the adapter's own dispatch and the local gateway (which dials through the adapter) pass through, so every lane and every recovery segment is compacted. Every step fails open: a saver that throws is skipped, a filter that throws passes the original text through, an unrecognised body shape is left alone — a request must never fail over the thing that was supposed to make it cheaper.
+- **A combo is a virtual catalog row, so failover is resolved in the adapter.** A chain joins the merged catalog as `channel:'combo'` plus a list of real model ids, which is why the picker advertises it and the gateway dials it by name like any other row; the chain is expanded and advanced inside the adapter's `runStream()`, so neither caller has to know about failover.
 
 ### Why a budget, and not `reasoning_effort`
 
@@ -696,7 +751,10 @@ On privacy and trust, plainly:
 ## Security and privacy
 
 - All state lives in `DSH_HOME/our-free-model/`; usage and settings stay local, nothing is uploaded.
+- **The aggregate lane's keys never leave the machine.** They are written only into the plugin's own `0600` `settings.json`, requests go only to the provider you configured, and the plugin's API echoes `hasKey` plus a `…abcd` fingerprint rather than the key itself; the Test and Discover probes redact the credential out of anything a provider answers back.
 - The forward listener binds a **loopback address only**, `127.0.0.1` by default, and rejects keyless requests. Widening it to a routable interface is refused: `POST /settings` answers 400 with the reason, and on a composition with no web server a hand-written `settings.json` simply does not start the listener. That traffic is spent from this machine's free lane; one string in a settings file should not put a whole subnet on it.
+- **Network access is a second door, not a relaxation of the rule above.** The local listener still binds loopback only and still refuses a routable address; reaching another machine takes an explicit switch, and then **every** request must carry the network key — `/` and `/health` included, unlike the local listener, because an unauthenticated liveness answer tells the whole subnet that this machine is here and proxying. The relay carries five whitelisted paths (`/v1/models`, `/v1/chat/completions`, `/v1/responses`, `/v1/messages`, `/v1/messages/count_tokens`, each also accepted without its `/v1` prefix) and is not a general proxy for whatever else answers on loopback; it swaps the network key for the local one at the door, so the two are never interchangeable; a request that already carries the relay's hop marker is refused with `508`, so a relay port equal to the local one cannot spin. The network key is minted by `crypto`, compared with `timingSafeEqual`, stored in the same `0600` file, and rotated on its own from the panel.
+
 - **Network access is a second door, not a relaxation of the rule above.** The local listener still binds loopback only and still refuses a routable address; reaching another machine takes an explicit switch, and then **every** request must carry the network key — `/` and `/health` included, unlike the local listener, because an unauthenticated liveness answer tells the whole subnet that this machine is here and proxying. The relay carries three whitelisted paths (`/v1/models`, `/v1/chat/completions`, `/v1/responses`) and is not a general proxy for whatever else answers on loopback; it swaps the network key for the local one at the door, so the two are never interchangeable; a request that already carries the relay's hop marker is refused with `508`, so a relay port equal to the local one cannot spin. The network key is minted by `crypto`, compared with `timingSafeEqual`, stored in the same `0600` file, and rotated on its own from the panel. **The address to dial is re-read from this machine's interfaces** — the panel polls it every 15 s while the relay is on, so a laptop that changed networks, woke from sleep or brought a VPN up is not told where it used to be. A machine commonly holds several private addresses at once (the router's `192.168.x.y`, plus whatever a virtual switch, tunnel or VPN adapter has), so the physical interface leads and is the address the panel offers to copy, with the others listed below it; the relay binds every interface, but whether a given address answers from another machine depends on the network that adapter is on.
 - **The EAC lane's per-user gate lives server-side.** The plugin carries only a shared signing secret, and any install can extract it — so the one place a per-person gate can actually hold is the gateway in front of the relay credential. A chat turn needs a token minted after a GitHub sign-in verified to have starred the repository; the star is re-checked on a configurable window (12 h by default), a removed star revokes at the next sweep, tokens are revocable at any time, and per-account rate and concurrency ceilings bound a shared token. The relay key never reaches the plugin, and the token never reaches the browser — the settings page sees a login name and a verdict.
 - The forward key is minted at runtime by `crypto`, compared with `timingSafeEqual`, and stored in a `0600` file. No hardcoded credential ships in this repository. `/` and `/health` answer ahead of the key check because they are liveness probes — they answer only "is it there"; the model roster requires the key.

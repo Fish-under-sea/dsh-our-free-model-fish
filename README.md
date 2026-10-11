@@ -34,6 +34,18 @@
 
 ---
 
+## 交流群
+
+<div align="center">
+  <img src="docs/images/qq-group-qr.png" alt="AI 技术交流学习群二维码" width="300">
+  <br>
+  <b>QQ 群：386179533（AI 技术交流学习群）</b>
+  <br>
+  扫码加入群聊，一起交流插件使用心得、反馈问题与分享玩法。
+</div>
+
+---
+
 ## 亮点
 
 - **开箱即用，无配置环节**——不需要账号、不需要 Key、不需要在后台申请配额。
@@ -50,9 +62,13 @@
 - **OpenAI 兼容转发端口**——本机其它工具通过 base URL 与 Key 即可调用这些模型。
 - **EAC 渠道（桌面端专属）**——在 DeepSeek Harness 桌面端与 DSHEAC AIO 桌面端中自动解锁一条协付通道，模型以 EAC 前缀显示（如 EAC DeepSeek V4.1 Flash）；凭据加密密封，由宿主指纹闸门把守；该渠道在服务器侧校验 GitHub 授权（登录并 star 本仓库）后才放行对话；在命令行及其它宿主中该通道完全不存在。详见「EAC 渠道」。
 - **Kilo 渠道（免密免费池）**——内置 Kilo AI 公共网关的免费模型池（`isFree` 清单实时拉取，含 `kilo-auto/free` 自动路由），无需任何账号或 Key；模型卡带 Kilo 徽章。思考强度与 EAC 渠道同款：模型自身的档位菜单（Off / Low / Medium / High，默认 High），经网关统一的 `reasoning` 参数真实下发——Off 已逐家族实测将思考归零（nemotron、ling、dots、poolside、apodex、cohere）；stepfun 与 liquid 端点强制思考（对关闭请求返回 400）、两个自动路由不透传关闭，这些模型的菜单不含 Off 档。该池由上游免费提供，上游会在其模型卡中声明 prompt 可能被记录用于改进服务——请勿发送敏感内容，详见「免责声明」。
+- **聚合渠道，自带 Key**——设置页新增一页，把第三方端点接进同一条模型清单：注册表内置 76 家提供商（NVIDIA NIM、OpenRouter、Groq、Cerebras、SambaNova、Gemini、DeepSeek、Mistral、Together、Fireworks、SiliconFlow、Nebius、Chutes、Hugging Face、Cloudflare、Z.ai、Kimi、MiniMax、QwenCloud/Alibaba、Bedrock、Vertex、Vercel AI Gateway、Azure OpenAI，以及无需账号的 Ollama、LM Studio、llama.cpp），写入 Key（本机免账号的提供商不需要）后其模型即以 `provider/model` 出现在选择器里，也可经本地网关调用。Key 只写入本机 0600 的 settings.json，API 只回显 `hasKey` 与 `…abcd` 指纹；每家可单独启停、测试（列表探测，不花一次生成）、发现模型、覆盖 Base URL 与模型清单。OAuth 与 ADC 认证的提供商照常列出，但标注为不可驱动。
+- **省 Token**——三件事：工具输出压缩（RTK）在请求发出前就地重写 `tool_result`（git diff / status / log、grep、find、ls、tree、构建日志、编号转储、搜索清单、重复日志行），实测 40 KB 的 `git diff` 移除 90% 的字节且模型仍能就它作答；提示词瘦身有 caveman 与 ponytail 两族、默认全关；另有五个不占用上游请求的本地应答。设置页用与用量图表同一批统计行显示压缩前后字节、节省比例、压缩块数与统计调用数。
+- **路由（降级链）**——把任意车道的模型串成一条命名链，以 `combo:<name>` 作为虚拟模型出现在选择器与网关上；`fallback` 固定从链首开始，`round-robin` 轮换起点并连续 N 轮粘滞。链接在输出任何正文之前失败会被整段丢弃，切换对调用方不可见；思考增量不算正文，因此「想了很久才撞上配额墙」正是降级最有价值的场景。
+- **本地网关原生说 Anthropic**——新增 `POST /v1/messages`（流式与非流式，含 thinking / tool_use 块、真实 stop_reason 与流内 error 事件）与 `POST /v1/messages/count_tokens`（本地估算）；`/v1/models` 广播全部车道，含聚合行与链路。网关页新增「接入客户端」分区，按实际绑定的端口与真实要求的密钥生成 Claude Code、Codex、OpenAI SDK、Anthropic SDK、curl 与局域网的可复制配方。
 - **接口具备鉴权围栏**——插件 HTTP 路由优先级高于内核 `/api`，因此内置与内核一致的信任检查（优先复用 composition 的 connection 服务，缺失时退回结构化围栏）。
 - **十三个白嫖渠道，一体接入**——CodeArts（华为云）、CodeBuddy / WorkBuddy（腾讯）、LobsterAI（有道）、Qoder / Qoder 中国版（阿里系）、TRAE（字节）、Cline、Loomy（讯飞）、Raccoon（商汤）、MiniMax Code、ZCode（智谱）、Gemini（Google Code Assist）十一个账号渠道开箱即用，外加 Kilo 免费车道与原匿名免费通道；OpenCode 账号渠道在本插件中默认停用。各渠道的登录流程、账号池、每日积分领取、模型黑名单与其本地 OpenAI 网关（Chat Completions + Responses，默认 `127.0.0.1:8326`）原样挂载与运行；凭据只写入宿主凭据库，浏览器永远拿不到明文。
-- **六页毛玻璃界面**——设置页重排为顶部导航的六个页面：**免费模型**（鱼缸水位 = 可用模型占比）、**EAC 模型**（鱼缸水位 = 协付池压力）、**白嫖模型接入**（十三张渠道卡：登录、账号、模型开关、一键领取积分）、**数据看板**（今日/全部 Token 消耗、平均生成速度、缓存命中率、成功率，账号透视与模型性能表、最近请求总览）、**运行日志**（逐请求明细：结果、耗时、首字、速度、Token 细分，失败原因悬停可见）与**网关设置**（网关开关/端点/密钥；局域网转发中继：监听地址、端口与独立中继密钥）。每页都有直达 GitHub 仓库的 Star 按钮。
+- **九页毛玻璃界面**——设置页顶部导航扩为九个页面：原有六页（**免费模型**（鱼缸水位 = 可用模型占比）、**EAC 模型**（鱼缸水位 = 协付池压力）、**白嫖模型接入**（十三张渠道卡：登录、账号、模型开关、一键领取积分）、**数据看板**（今日/全部 Token 消耗、平均生成速度、缓存命中率、成功率，账号透视与模型性能表、最近请求总览）、**运行日志**（逐请求明细：结果、耗时、首字、速度、Token 细分，失败原因悬停可见）与**网关设置**（网关开关/端点/密钥；局域网转发中继：监听地址、端口与独立中继密钥）），新增**聚合渠道**（提供商注册表、Key、测试、发现模型、Base URL 与模型清单覆盖）、**省 Token**（压缩开关、两族提示词档位、五个本地应答与节省统计）与**路由**（降级链编辑器）三页；网关设置页另增「接入客户端」分区。页面切换与卡片入场为 150–250 ms 短动效，`prefers-reduced-motion` 下整体关闭。每页都有直达 GitHub 仓库的 Star 按钮。
 - **局域网转发中继**——渠道网关本身只监听本机（上游的安全选择）；本插件提供自己的转发门：调用方用插件签发与轮换的中继密钥，转发跳由宿主换用网关凭据（凭据不出宿主进程），仅放行 `/v1/*` 模型接口并带环路保护。
 
 ## 你会看到什么
@@ -121,7 +137,7 @@ PROFILE_UPGRADE_REQUIRED: offline dependency migration is not yet available
 
 1. 将发布文件复制至 node_modules/dsh-our-free-model/
 （index.js、client.js、adapter/、src/、locale/、icon.svg、cordis.patch.yml、package.json——adapter/ 不可遗漏：index.js 首行即 import 该目录）
-2. 在 dependencies 中加入 "dsh-our-free-model": "1.5.0"——该版本号跟随仓库 package.json 的 version（版本变更时同步，当前为 1.5.0），不要沿用旧值，也不要写为 link:
+2. 在 dependencies 中加入 "dsh-our-free-model": "2.1.0"——该版本号跟随仓库 package.json 的 version（版本变更时同步，当前为 2.1.0），不要沿用旧值，也不要写为 link:
 3. 在 dsh.profile.bundles 末尾追加 "dsh-our-free-model"
 
 不要再向 cordis.patch.yml 添加条目。被 dsh.profile.bundles 引用的包，其自带的
@@ -203,6 +219,8 @@ git 执行 `git ls-remote`。若本机 git 配置了 `insteadOf` 重写（常见
 - GET /v1/models
 - POST /v1/chat/completions（流式与非流式）
 - POST /v1/responses
+- POST /v1/messages（流式与非流式，Anthropic Messages）
+- POST /v1/messages/count_tokens（本地估算，插件不含 tokenizer）
 
 端口被占用时插件不会静默失效：先在同一端口重试数轮（刚关闭的监听、刚删除的
 portproxy 规则通常在数百毫秒内释放），仍被占用则顺延至下一个可用端口，并在设置页标注
@@ -230,6 +248,7 @@ reasoning、reasoning_content、reasoning_text 三个字段识别——同一段
 在应用内完成（下载 → 校验 → 备份 → 替换 → 热重载），无需重新安装，也无需
 重启应用。升级失败会自动回滚至上一版本并给出失败原因。
 
+
 ### Gemini 与 Cline 的代理连接
 
 Gemini 登录需要访问 `accounts.google.com`、`oauth2.googleapis.com`、`www.googleapis.com`，模型请求还需访问 Google Code Assist 服务。浏览器能打开授权页，只说明浏览器的网络可用，插件仍需能访问这些端点。
@@ -237,6 +256,37 @@ Gemini 登录需要访问 `accounts.google.com`、`oauth2.googleapis.com`、`www
 Gemini 的登录、续期、项目探测和推理，以及 Cline 的登录、续期和推理，共用逐请求代理：优先使用已运行的插件出口代理，其次读取 `HTTP_PROXY` / `HTTPS_PROXY` / `ALL_PROXY`，最后在 Windows 读取当前用户的手动系统代理；没有代理时直连。环境代理遵守 `NO_PROXY`，系统代理遵守 `ProxyOverride`；回环请求不自动使用代理。无需为这两条渠道设置 `NODE_USE_ENV_PROXY`，也不会改动宿主的全局代理。
 
 Windows 自动检测只支持手动代理，不执行 PAC 自动配置脚本；系统设置最多缓存 30 秒。仅配置 PAC 时，请改用插件出口或环境代理。网络失败会显示所选路径及 `UND_ERR_CONNECT_TIMEOUT`、`ENOTFOUND` 等底层错误码；代理连接失败不会自动重试直连。浏览器回调未到达的授权超时仍需检查本机回调地址和端口是否可达。
+
+## 聚合渠道、省 Token、路由与本地网关
+
+### 聚合渠道：自带 Key 的 76 家提供商
+
+设置页的**聚合渠道**一页把第三方端点接进同一条模型清单。提供商注册表内置 76 家（`src/providers/registry.json`，分类为 `free | free-tier | apikey | oauth | local`），包括 NVIDIA NIM、OpenRouter、Groq、Cerebras、SambaNova、Gemini、DeepSeek、Mistral、Together、Fireworks、SiliconFlow、Nebius、Chutes、Hugging Face、Cloudflare、Z.ai、Kimi、MiniMax、QwenCloud/Alibaba、Bedrock、Vertex、Vercel AI Gateway、Azure OpenAI，以及本机、无需账号的 Ollama、LM Studio、llama.cpp。注册表数据来自 free-claude-code 的提供商目录与 9router 的提供商注册表。
+
+写入 Key（本机免账号的提供商不需要）后，该提供商的每个模型以 `provider/model` 成为清单行：在选择器里可选，也可经本地网关调用。三种线协议按提供商各自声明：OpenAI Chat Completions、OpenAI Responses 与 Anthropic Messages（后两者用于只提供这两种协议的上游）。
+
+Key 只写入插件自己的 0600 `settings.json`，接口永不回显——页面只显示 `hasKey` 与 `…abcd` 指纹；字段缺省表示保留已存 Key，空字符串表示清除。每家提供商提供：启用/停用、测试、发现模型、Base URL 覆盖（Azure / Cloudflare / Vertex 没有可用默认值，必须覆盖）、模型清单覆盖与移除。测试按钮是**列表探测**：它用提供商的模型列表验证 Key，不花一次生成；提供商声明没有列表接口时，按钮如实说明。OAuth 与 ADC（Google ADC）认证的提供商照常列出并标注「不可驱动」——本车道无法替它们完成交互式登录或云侧凭据流程。
+
+### 省 Token：工具输出压缩、提示词瘦身与本地应答
+
+**工具输出压缩（RTK）** 在请求发出之前就地重写 `tool_result` / `role:"tool"` 内容：git diff、git status、git log、grep、find、ls、tree、构建与包管理器日志、带行号的文件转储、Cursor 搜索清单，以及成串重复的日志行。实测：40 KB 的 `git diff` 移除 90% 的字节，模型仍就这份 diff 作出了回答。安全规则：报错的工具结果永不触碰，小于尺寸下限的内容不碰，替换结果永不大于原文，过滤器抛错时原样放行，且整条管线幂等。该压缩对全部车道生效（含本地网关），默认开启。
+
+**提示词瘦身** 有两族可选项与档位：`caveman`（电报体回复：`off/lite/full/ultra/wenyan-lite/wenyan/wenyan-ultra`）与 `ponytail`（YAGNI 最小实现：`off/lite/full/ultra`）。它们改变助手的说话方式，因此所有档位默认 `off`。注入是幂等的、按线协议进行的（chat 的 system 消息、Anthropic 的 `system`（含块数组形式，且插在最后一个 `cache_control` 之前）、Responses 的 `instructions`/input 项），并且可以撤销。
+
+**节省统计** 显示压缩前字节 → 压缩后字节、节省字节、节省比例、压缩块数与统计调用数——数据取自用量图表所用的同一批统计行。
+
+**五个本地应答**（自 free-claude-code 移植，各自独立开关，默认全开）不调用任何提供商：额度探测（`max_tokens:1` + "quota" → `Quota check passed.`）、shell 命令前缀识别（`<policy_spec>` + `Command:` → 前缀，检测到命令注入时拒绝）、会话标题生成（→ `Conversation`）、建议模式（→ 空字符串）与文件路径提取（→ `<filepaths>` 块）。它们由本地网关在进程内直接应答。
+
+### 路由：命名降级链（combo）
+
+一条命名、有序的模型 id 列表，跨全部车道，以 `combo:<name>` 出现在选择器与网关上，如同一个虚拟模型。两种策略：`fallback`（固定从链首开始）与 `round-robin`（轮换起点，连续 N 轮粘滞）。链会逐个链接尝试直到有一个产出输出；在**任何正文增量之前**失败的链接被整段丢弃，因此切换对调用方不可见。思考增量刻意不算正文——「想了一分钟，然后撞上配额墙」正是最值得降级的场景。一旦已有正文增量交付，之后的失败按正常方式结束该回合（单模型检查点恢复仍先获得它的续写尝试）。链路容量取交集（只有每个链接都支持视觉，链才声明视觉；上下文窗口取最小值），全部链接当前不可用的链会被原样保存并标注为不可用，而不是被静默丢弃。
+
+### 本地网关：原生 Anthropic 接口与接入配方
+
+新增端点 `POST /v1/messages`（流式与非流式，`message_start` / `content_block_*` / `message_delta` / `message_stop` 正确成帧，含 `thinking` 块、`tool_use` 块、真实 `stop_reason`，以及响应头发出之后才失败时的流内 `error` 事件）与 `POST /v1/messages/count_tokens`（本地估算——插件不含 tokenizer）。Claude Code 与 Anthropic 各 SDK 因此可以直接指向本插件。原有的 `/v1/chat/completions` 与 `/v1/responses` 不变，`/v1/models` 现在广播全部车道，含聚合行与链路。网关页新增「接入客户端」分区，按实际绑定的端口与真实要求的密钥生成可复制的配方：Claude Code 环境变量、Codex `config.toml`、OpenAI SDK、Anthropic SDK、curl，以及中继开启时的局域网版本。
+
+顺带修掉一个假成功：一轮只产出了一个调用方从未声明的工具调用时，过去会以干净的空成功收尾；现在会如实报告发生了什么——压缩器自己追加的 `[full diff: rtk git diff --no-compact]` 提示就可能让模型去调一个调用方没有的工具。
+
 
 ## 实现结构
 
@@ -252,7 +302,19 @@ src/stream.js 三种线协议解码（chat / messages / responses）归一为 ha
  并做不相交的 token 计数
 src/messages.js harness 消息 -> 各线协议形态，外加工具调用配对修复
 src/effort.js 思考档位 -> 输出预算
-src/forward.js 独立的 OpenAI 兼容监听器
+src/forward.js 独立的 OpenAI 兼容监听器（另含 Anthropic Messages 端点）
+src/providers/registry.json 聚合车道注册表：76 家提供商的分类、认证、线协议与端点
+src/providers/index.js 注册表读取与 provider/model 复合 id 解析
+src/aggregate.js 聚合车道：清单行、凭据解析、Key 脱敏、列表探测、按线协议发送
+src/anthropic.js /v1/messages 的 Anthropic Messages 编解码与本地 token 估算
+src/token-saver/index.js 压缩管线：提示词注入 -> 工具输出压缩，按字节留痕、失败开放
+src/token-saver/inject.js chat / messages / responses 三线的幂等注入与撤销
+src/token-saver/prompts.js caveman / ponytail 两族提示词与档位
+src/token-saver/rtk/ 工具输出过滤器：git diff/status/log、grep、find、ls、tree、
+ 构建日志、编号转储、搜索清单、重复日志行
+src/local-optimize.js 五个本地应答：额度探测、命令前缀、会话标题、建议模式、文件路径
+src/combos.js 降级链：虚拟清单行、两种策略、容量取交集
+src/route/classify.js 全车道统一的失败词汇与冷却策略
 src/trust.js 插件路由的请求信任围栏（connection 服务桥 + 结构化围栏）
 src/push.js SSE 推送枢纽：公告到达、更新可用、升级完成
 src/feed.js 远程公告 feed：多源拉取、校验、缓存、到达检测
@@ -274,6 +336,16 @@ client.js 浏览器半身：手写 ModuleLoader bundle，无构建步骤
 
 **使用自有 JSON 存储，不接入 settings seam。** settings 注册 API 在两版内核间不一致；
 私有 JSON 存储行为一致，且转发 Key 存放于 0600 权限文件中，不进入任何共享设置文档。
+
+**Token 压缩跑在唯一收口上，且失败开放。** 提示词注入与工具输出压缩在 payload 完成全部
+改写之后执行——指纹改名、档位补丁、密封车道的节奏提示都已落定——收口在 `payloadFor()`：
+适配器自己的派发与本地网关（它同样经适配器发起）都从这唯一一处经过，因此每条车道、每一段
+恢复请求都同样压缩。每一步都失败开放：压缩器抛错就跳过，过滤器抛错就原样放行，形态不认识
+就不动——一个请求绝不能因为一个「本来是为了让它更便宜」的环节而失败。
+
+**combo 是一条虚拟清单行，降级在适配器里解析。** 链路以 `channel:'combo'` 加一串真实模型
+id 并入合并后的清单，因此选择器照常广播它、本地网关照常按名调用它；链的展开与推进判定发生
+在适配器的 `runStream()` 内，于是两个调用方都不必知道降级这件事。
 
 ## 为什么用预算，而不是 reasoning_effort
 
@@ -595,9 +667,11 @@ DeepSeek Harness 桌面端（Electron 壳）：内核自身提供的 desktop pro
 
 所有状态写入 DSH_HOME/our-free-model/；用量与设置仅落在本机，不上传至任何位置。
 
+聚合车道的 Key 同样不出本机：它只写入插件自己的 0600 `settings.json`，请求只发往你自己配置的那家提供商，插件接口只回显 `hasKey` 与 `…abcd` 指纹，从不回显 Key 本身；测试与发现模型两次探测也把回包中的 Key 一律脱敏。
+
 转发监听仅绑定回环地址，默认 127.0.0.1，无 Key 请求一律拒绝。将地址改为可路由接口会被直接拒绝（POST /settings 返回 400 并注明原因；在无 web server 的 composition 中手工写入 settings.json 同样不会启动监听）——该端口的流量消耗的是本机这条免密车道，不应由一个字符串决定是否向整个子网开放。
 
-局域网访问是另开的一扇门，并不放宽上述规则：本机监听仍只绑回环、修改地址仍被拒绝；需要跨机器使用时必须显式启用"局域网访问"，中继绑定可路由地址，且每个请求都需携带局域网 Key——连 /、/health 这类存活探针也一并鉴权（仅本机监听免 Key 应答存活探测），否则一个未鉴权的应答等同于向整个子网宣告"该主机正在代理"。中继仅转发 /v1/models、/v1/chat/completions、/v1/responses 三条白名单路径，不代理任意 loopback 服务；入口处将局域网 Key 换为本机 Key，因此两把 Key 互不通用；携带跳数标记的请求直接拒绝（508），因此端口即使配置为本机监听的同一端口也不会自环。局域网 Key 同样由 crypto 生成、以 timingSafeEqual 比对、存放于同一 0600 文件中，可在面板上单独轮换。
+局域网访问是另开的一扇门，并不放宽上述规则：本机监听仍只绑回环、修改地址仍被拒绝；需要跨机器使用时必须显式启用"局域网访问"，中继绑定可路由地址，且每个请求都需携带局域网 Key——连 /、/health 这类存活探针也一并鉴权（仅本机监听免 Key 应答存活探测），否则一个未鉴权的应答等同于向整个子网宣告"该主机正在代理"。中继仅转发 /v1/models、/v1/chat/completions、/v1/responses、/v1/messages、/v1/messages/count_tokens 五条白名单路径（各自的去 /v1 写法同样放行），不代理任意 loopback 服务；入口处将局域网 Key 换为本机 Key，因此两把 Key 互不通用；携带跳数标记的请求直接拒绝（508），因此端口即使配置为本机监听的同一端口也不会自环。局域网 Key 同样由 crypto 生成、以 timingSafeEqual 比对、存放于同一 0600 文件中，可在面板上单独轮换。
 
 转发 Key 由 crypto 运行时生成、以 timingSafeEqual 比对、存放于 0600 权限文件中。本仓库不含任何硬编码凭据。/ 与 /health 为存活探针，先于 Key 检查应答，但仅回答"是否在线"，获取模型清单仍需 Key。
 

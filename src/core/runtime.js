@@ -2,6 +2,8 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { FreeModelAdapter, ROUTE_MAIN, ROUTE_REGION } from '../adapter.js'
 import { buildCatalog, buildEacCatalog, buildKiloCatalog, isEacEntry, isKiloEntry, parseListing, reviveKiloCatalog } from '../catalog.js'
+import { buildAggregateCatalog, isAggregateEntry } from '../aggregate.js'
+import { buildComboCatalog, isComboEntry, normalizeCombos, pruneRotation } from '../combos.js'
 import { JsonStore, SETTINGS_INITIAL, STATS_INITIAL, STATS_VERSION, migrateStats, pruneDays, recordTurn, recordUsage } from '../store.js'
 import { STATE, detectEgress, probeCatalog } from '../probe.js'
 import { CODE, getJson } from '../http.js'
@@ -54,15 +56,52 @@ export function createModelRuntime({
   let catalog = materializeCatalog(catalogStore.get().entries ?? [])
   let sealedCatalog = sealedCredential() === null ? [] : buildEacCatalog(catalogStore.get().sealIds ?? [])
   let kiloCatalog = reviveKiloCatalog(catalogStore.get().kiloRows)
+  /** The aggregate lane: one row per enabled provider/model the user configured.
+   *  Derived from settings, not from a listing, so it is rebuilt on every merge. */
+  let aggregateCatalog = []
+  /** The virtual rows a combo contributes; rebuilt last, after every real lane. */
+  let comboCatalog = []
+  /** The free lane's own roster: the base every other lane is merged onto. */
+  let freeCatalog = catalog
   let egress = availability.get().egress ?? null
   let gatewayLatency = { ms: 0, at: 0 }
   let disposed = false
   const lifetime = new AbortController()
   let reprobeTimer
 
+  /**
+   * Rebuild the merged catalog from its parts, in precedence order.
+   *
+   * Rebuilt rather than appended to, because every one of these lists can shrink:
+   * a provider the user switched off, a chain whose head was removed, a Kilo
+   * model that went paid. Appending only ever grew the view, so a removed row
+   * stayed dialable until the next full listing round happened to reset it.
+   *
+   * Combos come last on purpose — a chain's links have to already exist as real
+   * rows, which is also what makes `buildComboCatalog` drop a link that is gone
+   * instead of keeping a hopeful placeholder.
+   */
+  const rebuildCatalog = () => {
+    const seen = new Set()
+    const merged = []
+    for (const entry of [...freeCatalog, ...sealedCatalog, ...kiloCatalog, ...aggregateCatalog]) {
+      if (entry === null || entry === undefined || seen.has(entry.id)) continue
+      seen.add(entry.id)
+      merged.push(entry)
+    }
+    const combos = normalizeCombos(settings.get().combos)
+    comboCatalog = buildComboCatalog(combos, merged)
+    pruneRotation(combos)
+    for (const entry of comboCatalog) {
+      if (seen.has(entry.id)) continue
+      seen.add(entry.id)
+      merged.push(entry)
+    }
+    catalog = merged
+  }
   const mergeCatalogs = () => {
-    catalog = [...catalog, ...sealedCatalog.filter(row => !catalog.some(entry => entry.id === row.id))]
-    catalog = [...catalog, ...kiloCatalog.filter(row => !catalog.some(entry => entry.id === row.id))]
+    aggregateCatalog = buildAggregateCatalog(settings.get().aggregate ?? {})
+    rebuildCatalog()
   }
   mergeCatalogs()
   const state = () => ({
@@ -129,12 +168,12 @@ export function createModelRuntime({
     }
     if (disposed) return catalog
     if (ids.length > 0) {
-      catalog = buildCatalog(ids)
-      catalogStore.update({ at: Date.now(), entries: catalog.map(entry => entry.id) })
+      freeCatalog = buildCatalog(ids)
+      catalogStore.update({ at: Date.now(), entries: freeCatalog.map(entry => entry.id) })
       catalogStore.flush()
       settings.update({ catalogSyncedAt: Date.now() })
     } else {
-      catalog = materializeCatalog(catalogStore.get().entries ?? [])
+      freeCatalog = materializeCatalog(catalogStore.get().entries ?? [])
     }
     await refreshSealedRoster()
     if (disposed) return catalog
@@ -178,7 +217,8 @@ export function createModelRuntime({
   async function refreshSealedLane() {
     await refreshSealedRoster()
     if (disposed) return
-    catalog = catalog.filter(entry => entry.channel !== 'eac')
+    // The rebuild in `mergeCatalogs` drops a stale roster on its own: a closed
+    // lane's rows vanish without a filter pass over the merged view.
     mergeCatalogs()
     emitTopology()
   }
@@ -212,7 +252,16 @@ export function createModelRuntime({
   let probeThrottleStreak = 0
   let probeBackoffUntil = 0
   async function runProbeRound() {
-    const probeable = catalog.filter(entry => !isEacEntry(entry) && !isKiloEntry(entry))
+    // The absorbed channels get no per-model probes: their verdicts would be
+    // spent against a different gateway than the one that serves them, and a
+    // roster the listing named is advertised as-is (its health is the listing
+    // round's, refreshed on the same cadence). The aggregate lane is excluded
+    // for a sharper reason — a probe there is a *real request to a provider the
+    // user pays for*, spent to learn something the settings page already knows
+    // (whether a key is configured). A combo is excluded because it has no
+    // endpoint of its own: probing one would send the chain's own id to the free
+    // lane as a model name, spending quota to collect a verdict about nothing.
+    const probeable = catalog.filter(entry => !isEacEntry(entry) && !isKiloEntry(entry) && !isAggregateEntry(entry) && !isComboEntry(entry))
     const results = await probeCatalog(probeable, { attributionUserAgent, signal: lifetime.signal }, (id, result) => {
       if (disposed) return
       availability.edit(value => ({
@@ -275,6 +324,15 @@ export function createModelRuntime({
     state, adapter, refreshCatalog, refreshSealedLane, refreshAvailability, watchEgress, fetchListing,
     complete: createForwardCompletion({ adapter, state, signal: lifetime.signal }),
     publicModelRows: () => publicModelRows(state()),
+    // A settings write that changes the aggregate lane or the chains (a key
+    // saved, a provider switched off, a combo edited) rebuilds the merged view
+    // without a listing round: the aggregate rows come from settings alone.
+    syncAggregateCatalog() {
+      if (disposed) return catalog
+      mergeCatalogs()
+      emitTopology()
+      return catalog
+    },
     get catalog() { return catalog },
     get egress() { return egress },
     get gatewayLatency() { return gatewayLatency },

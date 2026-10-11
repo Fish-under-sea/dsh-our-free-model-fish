@@ -30,17 +30,34 @@ export function createForwardCompletion({ adapter, state, signal }) {
       throw Object.assign(new Error(`model "${request.model}" not found`), { statusCode: 404 })
     }
     const openAi = request.openAi ?? {}
-    const tools = (openAi.tools ?? []).map(normalizeTool).filter(Boolean)
+    // Two callers converge here. The OpenAI/Responses listener hands over a raw
+    // body; the Anthropic listener hands over harness messages it already
+    // projected through `fromAnthropicRequest`, because re-spelling them as
+    // OpenAI blocks and back would lose thinking blocks and block ordering. Both
+    // shapes end at the same adapter call, so there is exactly one place that
+    // decides which model runs.
+    const messages = Array.isArray(request.messages)
+      ? request.messages
+      : fromOpenAiMessages(openAi, request.responses === true, entry.id)
+    const tools = Array.isArray(request.tools)
+      ? request.tools
+      : (openAi.tools ?? []).map(normalizeTool).filter(Boolean)
     const handler = typeof onChunk === 'function' ? onChunk : () => {}
     const outcome = { text: '', toolCalls: [], usage: undefined, truncated: false, error: undefined }
+    const maxTokens = Number.isFinite(request.maxTokens) ? request.maxTokens
+      : Number.isFinite(openAi.max_tokens) ? openAi.max_tokens : undefined
+    const temperature = Number.isFinite(request.temperature) ? request.temperature
+      : Number.isFinite(openAi.temperature) ? openAi.temperature : undefined
+    const reasoningEffort = typeof request.reasoningEffort === 'string' ? request.reasoningEffort
+      : typeof openAi.reasoning_effort === 'string' ? openAi.reasoning_effort : undefined
     const options = {
       provider: ROUTE_MAIN, model: entry.id,
-      messages: fromOpenAiMessages(openAi, request.responses === true, entry.id),
+      messages,
       tools: tools.length > 0 ? tools : undefined,
-      ...typeof openAi.temperature === 'number' ? { temperature: openAi.temperature } : {},
-      ...typeof openAi.max_tokens === 'number' ? { maxTokens: openAi.max_tokens } : {},
-      ...typeof openAi.reasoning_effort === 'string' ? { reasoningEffort: openAi.reasoning_effort } : {},
-      sessionId: `forward:${String(openAi.user ?? openAi.conversation ?? 'shared')}`,
+      ...temperature === undefined ? {} : { temperature },
+      ...maxTokens === undefined ? {} : { maxTokens },
+      ...reasoningEffort === undefined ? {} : { reasoningEffort },
+      sessionId: `forward:${String(openAi.user ?? openAi.conversation ?? request.sessionId ?? 'shared')}`,
       signal: request.signal && signal ? AbortSignal.any([request.signal, signal]) : request.signal ?? signal,
     }
     for await (const chunk of adapter.stream(options, entry, snapshot)) {
@@ -127,8 +144,28 @@ export function foldForwardOutcome(outcome, chunk) {
     }
     case 'block-end':
       if (chunk.block?.type === 'tool-call') {
-        const existing = outcome.toolCalls.find(candidate => candidate.id === chunk.block.id)
-        if (existing === undefined) outcome.toolCalls.push({ slot: chunk.index, id: chunk.block.id, name: chunk.block.name, arguments: chunk.block.arguments })
+        // Match by slot first: the call's deltas were folded under this same
+        // block index, and a relayed stream can carry its id late — matching
+        // by id alone would miss the slot's entry and fold one call into two.
+        // The block-end carries the assembled arguments, so a slot match
+        // adopts them; an id match only fills identity fields.
+        const bySlot = outcome.toolCalls.find(candidate => candidate.slot === chunk.index)
+        if (bySlot !== undefined) {
+          if (typeof chunk.block.id === 'string' && chunk.block.id !== '') bySlot.id = chunk.block.id
+          if (typeof chunk.block.name === 'string' && chunk.block.name !== '') bySlot.name = chunk.block.name
+          if (typeof chunk.block.arguments === 'string') bySlot.arguments = chunk.block.arguments
+          break
+        }
+        const byId = outcome.toolCalls.find(candidate => typeof candidate.id === 'string' && candidate.id !== ''
+          && candidate.id === chunk.block.id)
+        if (byId === undefined) {
+          outcome.toolCalls.push({
+            slot: chunk.index,
+            id: typeof chunk.block.id === 'string' ? chunk.block.id : '',
+            name: typeof chunk.block.name === 'string' ? chunk.block.name : '',
+            arguments: typeof chunk.block.arguments === 'string' ? chunk.block.arguments : '',
+          })
+        }
       }
       break
     case 'usage': outcome.usage = toOpenAiUsage(chunk.usage); break

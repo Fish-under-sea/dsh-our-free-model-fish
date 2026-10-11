@@ -2,6 +2,19 @@
   "$schema": "./announcements.schema.md",
   "announcements": [
     {
+      "id": "2026-10-10-v2.1.0-release",
+      "title": "v2.1.0：聚合 API——自带 Key 接入 76 家服务商；省 Token（工具输出压缩实测省 90%）；自动降级链路；原生 /v1/messages",
+      "level": "update",
+      "pinned": true,
+      "createdAt": "2026-10-10T12:00:00Z",
+      "expiresAt": "2026-11-10T00:00:00Z",
+      "link": {
+        "url": "https://github.com/Ebony-Vinyl/dsh-our-free-model/releases/tag/v2.1.0",
+        "label": "查看完整说明"
+      },
+      "html": "<p><b>聚合 API</b>：设置页新增「聚合渠道」——填入自己的 Key 即可把 76 家服务商（NVIDIA NIM、OpenRouter、Groq、Cerebras、Gemini、DeepSeek、Ollama 本地等）并入同一个模型清单，和免费车道一起经本地网关对外服务。Key 只存在 0600 的本地文件里，界面只回显末四位。</p><p><b>省 Token</b>：新增「省 Token」页。工具输出压缩把 git diff / grep / ls / 构建日志等重写成同样信息量的短文本——实测一份 40 KB 的 diff 省下 90% 字节；另有克制的提示词档位（简答 / 极简）与五个「不调用模型直接回答」的本地应答（配额探测、命令前缀、标题、建议、文件路径），并给出累计节省面板。</p><p><b>自动降级链路</b>：新增「路由」页，把若干模型编成一条链（订阅 → 便宜 → 免费）。链上第一个能出字的模型即为答案，中途被限流、拒答或 5xx 时自动换下一个，且换模型发生在任何内容交付之前，对话里看不出接缝。</p><p><b>本地网关</b>：新增原生 Anthropic <code>/v1/messages</code> 与 <code>/v1/messages/count_tokens</code>，Claude Code 与 Anthropic SDK 可直连，无需 OpenAI 转译层；设置页「接入」区按实际端口与 Key 生成 Claude Code、Codex、OpenAI SDK、Anthropic SDK 与 curl 的配置片段。</p>"
+    },
+    {
       "id": "2026-10-06-v2.0.0-release",
       "title": "v2.0.0：免费渠道大升级——Kilo 车道上线；EAC 接入 GitHub 授权（登录 + Star）；登录链路加固",
       "level": "update",

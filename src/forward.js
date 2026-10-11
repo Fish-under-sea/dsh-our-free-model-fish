@@ -35,6 +35,8 @@ import dns from 'node:dns'
 import crypto from 'node:crypto'
 import { performance } from 'node:perf_hooks'
 import { baseModelId, FINGERPRINT_TOOLS } from './upstream.js'
+import { anthropicFrames, anthropicMessage, countTokens, foldAnthropicOutcome, fromAnthropicRequest } from './anthropic.js'
+import { toMessagesResponse, tryOptimizations } from './local-optimize.js'
 
 const MAX_BODY_BYTES = 8 * 1024 * 1024
 const REQUEST_ID_HEADER = 'x-ofm-request-id'
@@ -300,7 +302,7 @@ export async function bindForwardPort(server, { address, port, attempts = BIND_A
  * @param {(req: http.IncomingMessage, res: http.ServerResponse) => Promise<boolean>} [options.handleRequest] - 产品附加路由，返回 true 表示已处理。
  * @returns {Promise<{server: http.Server, port: number, close: () => Promise<void>}>}
  */
-export async function startForwardServer({ config, complete, modelRows, log = () => {}, onTrace = () => {}, heartbeatMs = SSE_HEARTBEAT_MS, health = () => ({ ok: true, service: 'our-free-model' }), handleRequest }) {
+export async function startForwardServer({ config, complete, modelRows, log = () => {}, onTrace = () => {}, heartbeatMs = SSE_HEARTBEAT_MS, optimize = null, health = () => ({ ok: true, service: 'our-free-model' }), handleRequest }) {
   const server = http.createServer((req, res) => {
     const trace = traceRequest(req, res, 'forward', onTrace)
     void handle(req, res, trace).catch(error => {
@@ -347,11 +349,20 @@ export async function startForwardServer({ config, complete, modelRows, log = ()
       return
     }
     if (req.method === 'POST' && (path === '/v1/chat/completions' || path === '/chat/completions')) {
-      await serveCompletion(req, res, complete, chatCompletions, heartbeatMs, trace)
+      await serveCompletion(req, res, complete, chatCompletions, heartbeatMs, trace, { optimize })
       return
     }
     if (req.method === 'POST' && (path === '/v1/responses' || path === '/responses')) {
-      await serveCompletion(req, res, complete, responsesEndpoint, heartbeatMs, trace)
+      await serveCompletion(req, res, complete, responsesEndpoint, heartbeatMs, trace, { optimize })
+      return
+    }
+    if (req.method === 'POST' && (path === '/v1/messages' || path === '/messages')) {
+      await serveCompletion(req, res, complete, messagesEndpoint, heartbeatMs, trace, { optimize })
+      return
+    }
+    if (req.method === 'POST' && (path === '/v1/messages/count_tokens' || path === '/messages/count_tokens')) {
+      const body = await readBody(req)
+      json(res, 200, countTokens(body))
       return
     }
     openAiError(res, 404, 'not_found_error', `no route for ${req.method} ${path}`)
@@ -442,6 +453,8 @@ const RELAY_PATHS = new Set([
   '/v1/models', '/models',
   '/v1/chat/completions', '/chat/completions',
   '/v1/responses', '/responses',
+  '/v1/messages', '/messages',
+  '/v1/messages/count_tokens', '/messages/count_tokens',
 ])
 
 /** Marks a request the relay produced, so a misconfigured loop is refused. */
@@ -593,7 +606,7 @@ export async function startLanRelay({ config, log = () => {}, onTrace = () => {}
 }
 
 /** 转发客户端断开时中止正在生成的段，也阻止后续恢复请求。 */
-async function serveCompletion(req, res, complete, endpoint, heartbeatMs, trace) {
+async function serveCompletion(req, res, complete, endpoint, heartbeatMs, trace, extra = {}) {
   const controller = new AbortController()
   const socket = req.socket
   const abort = () => {
@@ -627,7 +640,7 @@ async function serveCompletion(req, res, complete, endpoint, heartbeatMs, trace)
       trace.setOutcome(outcome)
       trace.step('generation_finished', { outcome })
       return result
-    }, { heartbeatMs, trace })
+    }, { heartbeatMs, trace, ...extra })
   } finally {
     req.removeListener('aborted', abort)
     socket?.removeListener('close', abort)
@@ -788,6 +801,11 @@ async function chatCompletions(req, res, complete, options = {}) {
       return
     }
     const calls = executableCalls(outcome, tools)
+    const suppressed = suppressedOnlyNote(outcome, calls)
+    if (suppressed !== null) {
+      openAiError(res, 502, 'server_error', suppressed)
+      return
+    }
     json(res, 200, {
       id, object: 'chat.completion', created, model,
       choices: [{
@@ -857,6 +875,15 @@ async function chatCompletions(req, res, complete, options = {}) {
   // client cannot run — is how the truncation loop used to come back by the
   // streaming door.
   const calls = executableCalls(outcome, tools)
+  const suppressed = suppressedOnlyNote(outcome, calls)
+  if (suppressed !== null) {
+    // Same reasoning as the `outcome.error` branch above: the status line is
+    // spent, so the only honest place left for the explanation is the stream.
+    sendSse(res, { error: { message: suppressed, type: 'server_error' } })
+    res.write('data: [DONE]\n\n')
+    res.end()
+    return
+  }
   sendSse(res, {
     id, object: 'chat.completion.chunk', created, model,
     choices: [{ index: 0, delta: {}, finish_reason: calls.length ? 'tool_calls' : outcome.truncated ? 'length' : 'stop' }],
@@ -882,6 +909,35 @@ function executableCalls(outcome, tools) {
     })
   }
   return calls.map((call, i) => ({ id: call.id || `call_${i}`, name: call.name, arguments: call.arguments }))
+}
+
+/**
+ * The sentence for a turn whose *only* output was a tool call the caller cannot run.
+ *
+ * This is the decoy filter's blind spot, measured live: the token saver compacts a
+ * diff and appends the filter's own `[full diff: rtk git diff --no-compact]` hint,
+ * the model obeys the hint by calling `bash` — and a caller that declared no tools
+ * has that call suppressed as a fingerprint decoy. The turn then ends with no text
+ * and `finish_reason: stop`, which is indistinguishable from "the model said
+ * nothing" and sends the user looking for a bug in the model rather than at the
+ * transcript. Suppressing the call is still right (the caller could not run it);
+ * reporting the turn as a success is not.
+ *
+ * Returns `null` when there is nothing to say — the caller asked for the tools, or
+ * the model also produced prose, or it produced nothing at all.
+ */
+function suppressedOnlyNote(outcome, calls) {
+  if (calls.length > 0) return null
+  // A ceiling cut is already reported honestly: `finish_reason: length` says the
+  // turn ran out of room, and the call that fell out of the executable set did so
+  // because its arguments never closed. Replacing that with "the model asked for a
+  // tool you did not declare" would blame the wrong thing.
+  if (outcome.truncated === true) return null
+  const attempted = Array.isArray(outcome.toolCalls) ? outcome.toolCalls : []
+  if (attempted.length === 0) return null
+  if (typeof outcome.text === 'string' && outcome.text !== '') return null
+  const names = [...new Set(attempted.map(call => call.name).filter(name => typeof name === 'string' && name !== ''))]
+  return `the model answered by calling ${names.length > 0 ? names.join(', ') : 'a tool'} instead of writing an answer, and this request declared no such tool — re-send it with that tool declared`
 }
 
 /** Responses-API spelling, so Codex-shaped local clients work too. */
@@ -977,6 +1033,12 @@ async function responsesEndpoint(req, res, complete, options = {}) {
       res.end()
       return
     }
+    const suppressedStream = suppressedOnlyNote(outcome, executableCalls(outcome, tools))
+    if (suppressedStream !== null) {
+      say('response.failed', { response: response({ status: 'failed', error: { message: suppressedStream } }) })
+      res.end()
+      return
+    }
     const finalUsage = usage === undefined ? undefined : {
       input_tokens: usage.prompt_tokens, output_tokens: usage.completion_tokens, total_tokens: usage.total_tokens,
       input_tokens_details: { cached_tokens: usage.prompt_tokens_details?.cached_tokens ?? 0 },
@@ -1012,6 +1074,11 @@ async function responsesEndpoint(req, res, complete, options = {}) {
     openAiError(res, 502, 'server_error', outcome.error)
     return
   }
+  const suppressedRows = suppressedOnlyNote(outcome, executableCalls(outcome, tools))
+  if (suppressedRows !== null) {
+    openAiError(res, 502, 'server_error', suppressedRows)
+    return
+  }
   const rows = outputRows(outcome)
   json(res, 200, {
     id, object: 'response', created_at: created, model, status: status(outcome),
@@ -1023,6 +1090,148 @@ async function responsesEndpoint(req, res, complete, options = {}) {
       total_tokens: outcome.usage?.total_tokens ?? 0,
     },
   })
+}
+
+/**
+ * The Anthropic Messages surface.
+ *
+ * Claude Code and the Anthropic SDKs speak this wire, and until this endpoint
+ * existed the only way to reach these lanes from them was an OpenAI-translation
+ * shim in front. It is a first-class surface rather than a translation bolt-on:
+ * the request is projected into the same harness messages the picker path
+ * builds — so tool pairing repair, image handling and the token savers all apply
+ * unchanged — and the answer is rendered straight from the harness chunk stream,
+ * so an Anthropic caller gets thinking blocks, `tool_use` blocks and a correct
+ * `stop_reason` without a lossy round trip through OpenAI's spelling.
+ *
+ * It is also where the five local answers live. A quota probe, a session title,
+ * a suggestion request or a filepath extraction is answered here, in-process,
+ * without spending a single upstream token (see `src/local-optimize.js`).
+ */
+async function messagesEndpoint(req, res, complete, options = {}) {
+  const body = await readBody(req)
+  options.trace?.step('body_received')
+  const parsed = fromAnthropicRequest(body)
+  if (parsed.error !== undefined) {
+    anthropicError(res, 400, 'invalid_request_error', parsed.error)
+    return
+  }
+  const model = baseModelId(parsed.model)
+  const wantsStream = parsed.stream === true
+  const id = `msg_${crypto.randomBytes(12).toString('hex')}`
+
+  // The five local answers, before any dispatch. A hit is a complete response:
+  // there is nothing to stream from, and nothing to bill.
+  const optimize = typeof options.optimize === 'function' ? options.optimize() : options.optimize
+  if (optimize !== null && optimize !== undefined && optimize.enabled === true) {
+    const local = tryOptimizations(body, { enabled: optimize, model })
+    if (local !== null) {
+      options.trace?.step('local_optimization', { kind: local.kind })
+      if (!wantsStream) {
+        json(res, 200, toMessagesResponse(local, { model, id }))
+        return
+      }
+      openStreamHeaders(res, options.heartbeatMs)
+      const localState = newMessageState(id, model)
+      const write = frame => { if (!res.destroyed) res.write(frame) }
+      // Rendered through the same frame generator the real stream uses, so a
+      // locally answered turn is byte-shaped exactly like a generated one.
+      for (const chunk of [
+        { type: 'text-delta', text: local.text, index: 0 },
+        { type: 'usage', usage: { inputTokens: local.usage?.input ?? 0, outputTokens: local.usage?.output ?? 0 } },
+        { type: 'finish', reason: { kind: 'stop' } },
+      ]) for (const frame of anthropicFrames(chunk, localState)) write(frame)
+      res.end()
+      return
+    }
+  }
+
+  // The system prompt rides the transcript as a leading system row rather than a
+  // separate `system` field. All three wires this plugin builds hoist a system
+  // row correctly (`toChatMessages` keeps it, `toClaudeMessages` folds it into
+  // `system`, `toResponseInput` emits an input message), while the `chat` wire is
+  // the only one that reads a top-level `system` — passing both would send the
+  // same instruction twice on a chat model.
+  const messages = parsed.system === '' || parsed.system === undefined
+    ? parsed.messages
+    : [{ role: 'system', content: [{ type: 'text', text: parsed.system }] }, ...parsed.messages]
+  const request = {
+    model,
+    messages,
+    tools: parsed.tools,
+    ...parsed.maxTokens === undefined ? {} : { maxTokens: parsed.maxTokens },
+    ...parsed.temperature === undefined ? {} : { temperature: parsed.temperature },
+    ...parsed.reasoningEffort === undefined ? {} : { reasoningEffort: parsed.reasoningEffort },
+  }
+  const outcome = { text: '', thinking: '', toolCalls: [], usage: undefined, truncated: false, error: undefined }
+
+  if (!wantsStream) {
+    const result = await complete(request, chunk => { foldAnthropicOutcome(outcome, chunk) })
+    if (result.error !== undefined) {
+      anthropicError(res, 502, 'api_error', result.error)
+      return
+    }
+    const suppressed = suppressedOnlyNote(outcome, executableCalls(outcome, ANTHROPIC_TOOL_WIRE))
+    if (suppressed !== null) {
+      anthropicError(res, 502, 'api_error', suppressed)
+      return
+    }
+    json(res, 200, anthropicMessage(outcome, { model, id }))
+    return
+  }
+
+  openStreamHeaders(res, options.heartbeatMs)
+  const state = newMessageState(id, model)
+  const write = frame => { if (!res.destroyed) res.write(frame) }
+  let result
+  try {
+    result = await complete(request, chunk => {
+      foldAnthropicOutcome(outcome, chunk)
+      for (const frame of anthropicFrames(chunk, state)) write(frame)
+    })
+  } catch (error) {
+    // A dispatch that throws *before* its first chunk — an unroutable model, a
+    // credential the lane refuses — would otherwise leave an empty 200 on the
+    // wire: the headers went out with the first frame's slot, and `handle`'s
+    // catch can only `res.end()` because the status line is spent. An Anthropic
+    // client watching for `message_stop` sees a truncated stream instead of the
+    // reason, so the failure is rendered as the error event the protocol has for
+    // exactly this. (The adapter reports its own failures as a `finish` chunk
+    // rather than a throw, so this path is the pre-chunk one.)
+    result = { error: String(error?.message ?? error) }
+  }
+  if (result.error === undefined && state.finished !== true) {
+    const suppressed = suppressedOnlyNote(outcome, executableCalls(outcome, ANTHROPIC_TOOL_WIRE))
+    if (suppressed !== null) result = { error: suppressed }
+  }
+  if (result.error !== undefined && state.finished !== true) {
+    // `state.finished` keeps a turn that already closed its own stream from
+    // getting a second `message_stop`, which strict clients reject.
+    for (const frame of anthropicFrames({ type: 'finish', reason: { kind: 'error', failure: { message: String(result.error) } } }, state)) write(frame)
+  }
+  res.end()
+}
+
+/** `executableCalls`' contract, for a wire that suppresses nothing. */
+const ANTHROPIC_TOOL_WIRE = { executable: () => true }
+
+/** The per-turn renderer state `anthropicFrames` threads through. */
+function newMessageState(messageId, model) {
+  return {
+    messageId, model,
+    started: false, finished: false,
+    blockIndex: 0, openBlock: null,
+    toolSlots: new Map(),
+    inputTokens: 0, outputTokens: 0,
+    stopReason: null,
+  }
+}
+
+/** Anthropic's error envelope, which is `{type:'error', error:{type, message}}`. */
+function anthropicError(res, status, type, message) {
+  const body = JSON.stringify({ type: 'error', error: { type, message: String(message) } })
+  res.writeHead(status, { ...corsHeaders(), 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store' })
+  res.end(body)
 }
 
 export function toOpenAiUsage(usage) {

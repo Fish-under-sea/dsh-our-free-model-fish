@@ -74,6 +74,20 @@ const suites = [
   ['eac-login', 'eac-login-test.mjs', []],
   ['kilo', 'kilo-test.mjs', []],
   ['offline', 'offline-test.mjs', []],
+  // The aggregated feature set: the token savers ported from the upstream
+  // routers, the provider registry, the failure/chain brain, the Anthropic
+  // wire, the local answers, and the aggregate lane driver. Each is a pure
+  // module with its own offline suite; `aggregate-wiring` is the one that
+  // proves the host actually reaches them.
+  ['rtk', 'rtk-test.mjs', []],
+  ['local-optimize', 'local-optimize-test.mjs', []],
+  ['registry', 'registry-test.mjs', []],
+  ['route', 'route-test.mjs', []],
+  ['combo-advance', 'combo-advance-test.mjs', []],
+  ['prompt-saver', 'prompt-saver-test.mjs', []],
+  ['anthropic', 'anthropic-test.mjs', []],
+  ['aggregate', 'aggregate-test.mjs', []],
+  ['aggregate-wiring', 'aggregate-wiring-test.mjs', []],
 ].filter(([name]) => (mode === 'contributor' ? !['manifest', 'release'].includes(name)
   : mode === 'release' ? releaseSuites.has(name) : true)
   && (only === null || name.startsWith(only)))

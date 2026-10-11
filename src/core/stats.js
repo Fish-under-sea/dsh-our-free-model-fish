@@ -1,4 +1,5 @@
 import { MIN_DECODE_MS } from '../store.js'
+import { describeSavingsTotal, emptySavings, savingsPercent } from '../token-saver/index.js'
 
 export function buildStats(stats, catalog) {
   const days = stats.days ?? {}
@@ -34,7 +35,11 @@ export function buildStats(stats, catalog) {
     model, input: 0, output: 0, reasoning: 0, cacheRead: 0, calls: 0, failed: 0,
     ttftMs: 0, ttftSamples: 0, decodeMs: 0, decodeTokens: 0,
   })
-  const modelIds = new Set([...Object.keys(totals), ...Object.keys(lifetimeModels)])
+  // The logical map is part of the row set, not just a lookup table: a combo
+  // records its turn under the chain's own id and its physical calls under each
+  // link's, so a chain that never appears here would show its links in the panel
+  // and be invisible itself — the one row a user configuring a chain looks for.
+  const modelIds = new Set([...Object.keys(totals), ...Object.keys(lifetimeModels), ...Object.keys(logicalModels)])
   const named = [...modelIds].map(model => {
     const row = totals[model] ?? empty(model)
     const lifetime = lifetimeModels[model] ?? {}
@@ -63,6 +68,7 @@ export function buildStats(stats, catalog) {
   const failedTurns = Number.isSafeInteger(logical.failed) ? logical.failed : named.reduce((sum, row) => sum + row.failedTurns, 0)
   const recoveredTurns = Number.isSafeInteger(logical.recovered) ? logical.recovered : named.reduce((sum, row) => sum + row.recoveredTurns, 0)
   const hasLifetimeFailures = Number.isSafeInteger(stats.failedRequests)
+  const savings = { ...emptySavings(), ...(stats.savings ?? {}) }
   return {
     requests: stats.requests ?? 0,
     requestFailures: hasLifetimeFailures ? stats.failedRequests : physicalFailed,
@@ -74,6 +80,10 @@ export function buildStats(stats, catalog) {
     days: series,
     models: named,
     samples: (stats.samples ?? []).slice(-200),
+    // What the token savers measured. The percentage is computed here, from the
+    // same bytes the rows above counted, so the panel never has to derive a rate
+    // from two numbers that were rounded separately.
+    savings: { ...savings, percent: savingsPercent(savings), summary: describeSavingsTotal(savings) },
     grand: {
       input: named.reduce((sum, row) => sum + row.input, 0),
       output: named.reduce((sum, row) => sum + row.output, 0),

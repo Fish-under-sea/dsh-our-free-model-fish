@@ -475,6 +475,184 @@ window.__ModuleLoader__.load({
         'chan.auto.ran': '今日已自动签到',
         'chan.auto.off': '今日尚未签到',
         'chan.auto.last': '上次结果：{result}',
+        'nav.tab.aggregate': '聚合渠道',
+        'nav.tab.saver': '省 Token',
+        'nav.tab.routing': '路由',
+        'agg.title': '聚合渠道',
+        'agg.sub': '把第三方 OpenAI 兼容端点接进同一条模型清单：写入本机的 Key 只以指纹回显，保存后清单与模型选择器一起更新。',
+        'agg.registryCount': '注册表 {n} 家',
+        'agg.configuredCount': '已配置 {n} 家',
+        'agg.addProvider': '添加提供商',
+        'agg.addTitle': '选择提供商',
+        'agg.addHint': '可按分类、协议与认证方式筛选。标了「不可驱动」的提供商需要交互式登录或云侧凭据，本车道不会调用它们。',
+        'agg.search': '搜索名称或 ID',
+        'agg.filterCategory': '分类',
+        'agg.filterFormat': '协议',
+        'agg.filterAuth': '认证',
+        'agg.filterAll': '全部',
+        'agg.showing': '显示 {shown} / {total} 家',
+        'agg.noMatch': '没有匹配的提供商。',
+        'agg.notUsable': '不可驱动',
+        'agg.notUsableWhy': '本车道不会调用它：认证方式是「{kind}」，需要交互式登录或云侧凭据，只能由宿主自己接管。',
+        'agg.credential': '获取 Key',
+        'agg.modelCount': '{n} 个模型',
+        'agg.select': '配置',
+        'agg.configuredTitle': '已配置的提供商',
+        'agg.configuredHint': '保存后立即生效：清单与模型选择器一起更新。',
+        'agg.empty': '还没有接入任何聚合提供商',
+        'agg.emptyHint': '这一页把第三方端点接进模型清单：聚合站、免费额度池、本机推理服务都行。填入 Key 与可选的 Base URL，它们的模型就会出现在模型选择器里，也能成为降级链的一环。',
+        'agg.filterEmpty': '没有符合筛选条件的已配置提供商。',
+        'agg.contributes': '当前贡献 {n} 个模型',
+        'agg.contributesNone': '当前未贡献任何模型',
+        'agg.hasKey': '已存 Key {hint}',
+        'agg.noKey': '未存 Key',
+        'agg.enabled': '启用',
+        'agg.disabled': '已停用',
+        'agg.key': 'API Key',
+        'agg.keyPlaceholder': '粘贴新的 API Key（留空则保持不变）',
+        'agg.keyKeep': '留空保持当前 Key 不变；要删除请用下面的清除按钮。',
+        'agg.keyClear': '清除已保存的 Key',
+        'agg.keyClearWarn': '清除后该提供商立即停止贡献模型，直到重新填入 Key。',
+        'agg.baseUrl': 'Base URL',
+        'agg.baseUrlHint': '留空则使用注册表默认值。',
+        'agg.baseUrlDefault': '注册表默认：{url}',
+        'agg.baseUrlEnv': '也可用环境变量 {env} 覆盖',
+        'agg.models': '模型覆盖',
+        'agg.modelsHint': '逗号或换行分隔的模型 ID；留空则用它自己声明的清单。',
+        'agg.modelsPlaceholder': 'model-a, model-b',
+        'agg.test': '测试',
+        'agg.testing': '测试中…',
+        'agg.testOk': '验证通过',
+        'agg.testFailed': '验证失败',
+        'agg.testUnverified': '无法验证',
+        'agg.testUnverifiedWhy': '该提供商不提供模型列表接口，验证它要花掉一次真实生成——这里不做。',
+        'agg.testAt': '最近测试 {when}',
+        'agg.neverTested': '尚未测试',
+        'agg.discover': '发现模型',
+        'agg.discovering': '发现中…',
+        'agg.discovered': '发现 {n} 个模型',
+        'agg.discoveredNone': '该提供商不提供模型列表。',
+        'agg.discoveredUse': '填入模型覆盖',
+        'agg.save': '保存',
+        'agg.saving': '保存中…',
+        'agg.add': '添加',
+        'agg.remove': '移除',
+        'agg.removeConfirm': '确认移除',
+        'agg.removeWarn': '移除后它贡献的模型立即从清单消失，已保存的 Key 一并删除。',
+        'agg.cancel': '取消',
+        'agg.saved': '已保存',
+        'agg.savedBody': '{name} 的配置已保存。',
+        'agg.removedBody': '{name} 已移除。',
+        'agg.failed': '操作失败',
+        'agg.loadFailed': '无法读取提供商注册表',
+        'agg.category.apikey': 'API Key',
+        'agg.category.free': '完全免费',
+        'agg.category.freeTier': '免费额度',
+        'agg.category.local': '本机',
+        'agg.category.oauth': 'OAuth',
+        'agg.auth.apiKey': 'API Key',
+        'agg.auth.none': '免认证',
+        'agg.auth.oauth': 'OAuth 登录',
+        'agg.auth.adc': '云侧凭据',
+        'saver.title': '省 Token',
+        'saver.sub': '在请求离开本机之前压缩它：工具输出重编码、提示词瘦身，以及五个不占用上游请求的本地应答。',
+        'saver.master': '启用 Token 压缩',
+        'saver.masterHint': '关掉后所有压缩立即停止，请求按原样发出；下面的设置保留。',
+        'saver.rtk': 'RTK 工具输出压缩',
+        'saver.rtkWhat': '压缩的是工具结果：git diff / status / log、grep、find、ls、tree、构建日志、带行号的文件转储，以及重复的日志行。',
+        'saver.rtkSafety': '安全边界：报错的工具结果原样保留，小体积内容不碰，替换只在新文本更小且非空时发生——压缩结果永远不会比原文更大。',
+        'saver.promptTitle': '提示词压缩',
+        'saver.promptHint': '在系统提示里追加一条写作指令。这是唯一能减少输出 Token 的压缩，因为它改变的是模型怎么写。',
+        'saver.caveman': 'Caveman',
+        'saver.cavemanWhat': '电报体回复：去掉客套与重复解释，只留结论与代码。',
+        'saver.ponytail': 'Ponytail',
+        'saver.ponytailWhat': 'YAGNI 最小实现：只写被要求的那一件事，不主动加抽象、配置与兜底。',
+        'saver.voiceWarn': '注意：这两族会改变助手的说话方式，并且会留在你的对话记录里。默认关闭。',
+        'saver.localTitle': '本地应答',
+        'saver.localHint': '这五类请求的答案就在请求体里，转发出去只是白花一次上游额度与一个来回。',
+        'saver.local.enabled': '启用本地应答',
+        'saver.local.quota': '额度探测',
+        'saver.local.quotaHint': '回答「额度检查」这类探针，返回一句固定答复。',
+        'saver.local.prefix': '命令前缀',
+        'saver.local.prefixHint': '回答权限提示要的命令前缀，从 shell 命令里解析。',
+        'saver.local.title': '会话标题',
+        'saver.local.titleHint': '回答标题生成请求，返回固定标题。',
+        'saver.local.suggestion': '建议模式',
+        'saver.local.suggestionHint': '回答建议模式的空转回合，不产生上游请求。',
+        'saver.local.filepath': '文件路径提取',
+        'saver.local.filepathHint': '从命令与输出里解析出文件路径，返回结构化结果。',
+        'saver.dashTitle': '节省统计',
+        'saver.dashHint': '按字节统计本机实际发生的压缩，只写入本机。',
+        'saver.bytesBefore': '压缩前',
+        'saver.bytesAfter': '压缩后',
+        'saver.bytesSaved': '节省字节',
+        'saver.percent': '节省比例',
+        'saver.blocks': '压缩块数',
+        'saver.calls': '统计调用',
+        'saver.promptCalls': '提示词注入',
+        'saver.noData': '还没有可统计的请求。发起一次对话后，这里显示的是真实压缩字节数，不是估算。',
+        'saver.report': '统计口径',
+        'saver.saved': '已保存',
+        'saver.savedBody': 'Token 压缩设置已保存。',
+        'saver.failed': '保存失败',
+        'saver.loadFailed': '无法读取 Token 压缩设置',
+        'saver.level.off': '关闭',
+        'saver.level.lite': '轻',
+        'saver.level.full': '全',
+        'saver.level.ultra': '极',
+        'saver.level.wenyanLite': '文言·轻',
+        'saver.level.wenyan': '文言',
+        'saver.level.wenyanUltra': '文言·极',
+        'routing.title': '路由',
+        'routing.sub': '把若干模型串成一条降级链：链上第一个失败就换下一个，对调用方始终只有一个模型 ID。',
+        'routing.chains': '已存链路',
+        'routing.chainsHint': '链路按输入顺序保存；引用当前不可用模型的链路会原样保留，车道恢复后自己回来。',
+        'routing.empty': '还没有降级链',
+        'routing.emptyHint': '一条链就是一个虚拟模型：在模型选择器里选它，请求按顺序尝试链上的每个真实模型。用来兜住某个车道临时不可用的时段。',
+        'routing.newChain': '新建链路',
+        'routing.name': '名称',
+        'routing.namePlaceholder': '例如：先免费后协付',
+        'routing.strategy': '策略',
+        'routing.strategy.fallback': '顺序降级',
+        'routing.strategy.roundRobin': '轮询',
+        'routing.stickyLimit': '轮询粘滞次数',
+        'routing.stickyHint': '轮询时同一个模型连续用多少次再换下一个。',
+        'routing.members': '成员（按顺序）',
+        'routing.addMember': '添加成员',
+        'routing.memberEmpty': '还没有成员——点「添加成员」从清单里挑一个。',
+        'routing.moveUp': '上移',
+        'routing.moveDown': '下移',
+        'routing.removeMember': '移除',
+        'routing.pickModel': '选择模型',
+        'routing.searchModel': '搜索模型 ID 或名称',
+        'routing.noModel': '没有匹配的模型。',
+        'routing.usable': '可用',
+        'routing.notUsable': '当前不可用',
+        'routing.missing': '不在清单中的成员：{ids}',
+        'routing.notUsableWhy': '链路原样保存，不会因为某条车道今天关闭而被改写；这些 ID 回到清单里它就自己恢复。如果是拼写错误，编辑链路改正即可。',
+        'routing.resolved': '解析为',
+        'routing.memberCount': '{n} 个成员',
+        'routing.save': '保存链路',
+        'routing.saved': '已保存',
+        'routing.savedBody': '链路已保存。',
+        'routing.failed': '保存失败',
+        'routing.loadFailed': '无法读取链路设置',
+        'routing.cancel': '取消',
+        'routing.edit': '编辑',
+        'routing.delete': '删除',
+        'routing.deleteConfirm': '确认删除',
+        'routing.deleteWarn': '删除后这个模型 ID 立即从清单消失，正在引用它的客户端会拿到 404。',
+        'routing.enabled': '启用',
+        'routing.channel.free': '免费车道',
+        'routing.channel.eac': 'EAC 协付',
+        'routing.channel.kilo': 'Kilo',
+        'routing.channel.aggregate': '聚合',
+        'routing.channel.combo': '链路',
+        'gw.clientsTitle': '接入客户端',
+        'gw.clientsHint': '免费车道转发端口（在「免费模型」页的「本地转发」里开关）的接入配方：地址与 Key 按实际绑定的端口与真实密钥生成。',
+        'gw.clientsOff': '转发端口未启用',
+        'gw.clientsOffHint': '先到「免费模型」页的「本地转发」打开端口，这里才会给出可用的地址与配方。',
+        'gw.clientsModels': '可转发模型 {n} 个',
       },
       en: {
         'meta.title': 'Our Free Model',
@@ -910,6 +1088,184 @@ window.__ModuleLoader__.load({
         'chan.auto.ran': 'Checked in today',
         'chan.auto.off': 'Not checked in today',
         'chan.auto.last': 'Last result: {result}',
+        'nav.tab.aggregate': 'Aggregate',
+        'nav.tab.saver': 'Token savers',
+        'nav.tab.routing': 'Routing',
+        'agg.title': 'Aggregate providers',
+        'agg.sub': 'Bring third-party OpenAI-compatible endpoints into the same model roster: a key written here is echoed back as a fingerprint only, and saving updates the roster and the model picker together.',
+        'agg.registryCount': '{n} in the registry',
+        'agg.configuredCount': '{n} configured',
+        'agg.addProvider': 'Add provider',
+        'agg.addTitle': 'Choose a provider',
+        'agg.addHint': 'Filter by category, wire format and auth kind. A provider marked "not drivable" needs an interactive login or cloud credentials, and this lane never calls it.',
+        'agg.search': 'Search name or id',
+        'agg.filterCategory': 'Category',
+        'agg.filterFormat': 'Format',
+        'agg.filterAuth': 'Auth',
+        'agg.filterAll': 'All',
+        'agg.showing': 'Showing {shown} of {total}',
+        'agg.noMatch': 'No provider matches.',
+        'agg.notUsable': 'Not drivable',
+        'agg.notUsableWhy': 'This lane never calls it: its auth kind is "{kind}", which needs an interactive login or cloud-side credentials, so only the host can take it over.',
+        'agg.credential': 'Get a key',
+        'agg.modelCount': '{n} models',
+        'agg.select': 'Configure',
+        'agg.configuredTitle': 'Configured providers',
+        'agg.configuredHint': 'Changes take effect immediately: saving updates the roster and the model picker together.',
+        'agg.empty': 'No aggregate provider is connected yet',
+        'agg.emptyHint': 'This page brings third-party endpoints into the model roster: an aggregator, a free-tier pool, a local inference server. Fill in a key and an optional base URL and their models appear in the model picker — and can become a link in a fallback chain.',
+        'agg.filterEmpty': 'No configured provider matches the filter.',
+        'agg.contributes': 'Contributes {n} models',
+        'agg.contributesNone': 'Contributes no model right now',
+        'agg.hasKey': 'Key {hint}',
+        'agg.noKey': 'No key stored',
+        'agg.enabled': 'Enabled',
+        'agg.disabled': 'Disabled',
+        'agg.key': 'API key',
+        'agg.keyPlaceholder': 'Paste a new API key (leave empty to keep the current one)',
+        'agg.keyKeep': 'Empty keeps the stored key; use the clear button below to delete it.',
+        'agg.keyClear': 'Clear the stored key',
+        'agg.keyClearWarn': 'Clearing it stops this provider from contributing models until a key is entered again.',
+        'agg.baseUrl': 'Base URL',
+        'agg.baseUrlHint': 'Empty uses the registry default.',
+        'agg.baseUrlDefault': 'Registry default: {url}',
+        'agg.baseUrlEnv': 'Can also be overridden by the {env} environment variable',
+        'agg.models': 'Model override',
+        'agg.modelsHint': 'Model ids separated by commas or newlines; empty uses the list the provider declares.',
+        'agg.modelsPlaceholder': 'model-a, model-b',
+        'agg.test': 'Test',
+        'agg.testing': 'Testing…',
+        'agg.testOk': 'Verified',
+        'agg.testFailed': 'Failed',
+        'agg.testUnverified': 'Not verifiable',
+        'agg.testUnverifiedWhy': 'This provider declares no model listing, so verifying it would cost one real generation — not done here.',
+        'agg.testAt': 'Last test {when}',
+        'agg.neverTested': 'Not tested yet',
+        'agg.discover': 'Discover models',
+        'agg.discovering': 'Discovering…',
+        'agg.discovered': 'Found {n} models',
+        'agg.discoveredNone': 'This provider declares no model listing.',
+        'agg.discoveredUse': 'Use these as the override',
+        'agg.save': 'Save',
+        'agg.saving': 'Saving…',
+        'agg.add': 'Add',
+        'agg.remove': 'Remove',
+        'agg.removeConfirm': 'Confirm removal',
+        'agg.removeWarn': 'Removing it drops its models from the roster immediately and deletes the stored key.',
+        'agg.cancel': 'Cancel',
+        'agg.saved': 'Saved',
+        'agg.savedBody': 'The configuration for {name} is saved.',
+        'agg.removedBody': '{name} was removed.',
+        'agg.failed': 'Action failed',
+        'agg.loadFailed': 'Cannot read the provider registry',
+        'agg.category.apikey': 'API key',
+        'agg.category.free': 'Fully free',
+        'agg.category.freeTier': 'Free tier',
+        'agg.category.local': 'Local',
+        'agg.category.oauth': 'OAuth',
+        'agg.auth.apiKey': 'API key',
+        'agg.auth.none': 'No auth',
+        'agg.auth.oauth': 'OAuth login',
+        'agg.auth.adc': 'Cloud credentials',
+        'saver.title': 'Token savers',
+        'saver.sub': 'Compact a request before it leaves this machine: tool output re-encoded, the prompt slimmed, and five answers produced locally without an upstream call.',
+        'saver.master': 'Enable token compaction',
+        'saver.masterHint': 'Turning this off stops every saver at once and sends requests as written; the settings below are kept.',
+        'saver.rtk': 'RTK tool-output compaction',
+        'saver.rtkWhat': 'What it compacts: tool results — git diff / status / log, grep, find, ls, tree, build logs, numbered file dumps and duplicate log lines.',
+        'saver.rtkSafety': 'Safety rules: an error result is left untouched, small bodies are not touched, and a blob is replaced only when the new text is non-empty and strictly smaller — a compacted result is never larger than the original.',
+        'saver.promptTitle': 'Prompt shaping',
+        'saver.promptHint': 'Appends a writing instruction to the system prompt. It is the only saver that can cut output tokens, because it changes what the model writes.',
+        'saver.caveman': 'Caveman',
+        'saver.cavemanWhat': 'Terse replies: pleasantries and repeated explanation dropped, conclusions and code kept.',
+        'saver.ponytail': 'Ponytail',
+        'saver.ponytailWhat': 'YAGNI-minimal replies: only the one thing that was asked for, no unrequested abstraction, config or fallback.',
+        'saver.voiceWarn': 'Heads-up: both families change how the assistant talks, and that lands in your transcript. Off by default.',
+        'saver.localTitle': 'Local answers',
+        'saver.localHint': 'The answer to these five requests is already in the request body; forwarding one spends a round trip and upstream quota on a question with one right answer.',
+        'saver.local.enabled': 'Enable local answers',
+        'saver.local.quota': 'Quota probe',
+        'saver.local.quotaHint': 'Answers a "quota check" probe with a fixed line.',
+        'saver.local.prefix': 'Command prefix',
+        'saver.local.prefixHint': 'Answers the command prefix behind a permission prompt, parsed from the shell command.',
+        'saver.local.title': 'Session title',
+        'saver.local.titleHint': 'Answers a title-generation request with a fixed title.',
+        'saver.local.suggestion': 'Suggestion mode',
+        'saver.local.suggestionHint': 'Answers a suggestion-mode turn without producing an upstream request.',
+        'saver.local.filepath': 'Filepath extraction',
+        'saver.local.filepathHint': 'Parses the file paths out of a command and its output, and returns them structured.',
+        'saver.dashTitle': 'Savings',
+        'saver.dashHint': 'Bytes actually compacted on this machine, written locally only.',
+        'saver.bytesBefore': 'Before',
+        'saver.bytesAfter': 'After',
+        'saver.bytesSaved': 'Bytes saved',
+        'saver.percent': 'Saved',
+        'saver.blocks': 'Blocks compacted',
+        'saver.calls': 'Calls measured',
+        'saver.promptCalls': 'Prompts shaped',
+        'saver.noData': 'No request measured yet. One conversation later, this shows real compacted bytes rather than an estimate.',
+        'saver.report': 'Reported as',
+        'saver.saved': 'Saved',
+        'saver.savedBody': 'The token-saver settings are saved.',
+        'saver.failed': 'Not saved',
+        'saver.loadFailed': 'Cannot read the token-saver settings',
+        'saver.level.off': 'Off',
+        'saver.level.lite': 'Lite',
+        'saver.level.full': 'Full',
+        'saver.level.ultra': 'Ultra',
+        'saver.level.wenyanLite': 'Classical · lite',
+        'saver.level.wenyan': 'Classical',
+        'saver.level.wenyanUltra': 'Classical · ultra',
+        'routing.title': 'Routing',
+        'routing.sub': 'Chain several models into one fallback chain: when a link refuses, the next one answers, and the caller still sees a single model id.',
+        'routing.chains': 'Stored chains',
+        'routing.chainsHint': 'Chains are stored in the order you entered them; a chain that references a model which is unavailable right now is kept as written and comes back by itself when the lane does.',
+        'routing.empty': 'No fallback chain yet',
+        'routing.emptyHint': 'A chain is a virtual model: pick it in the model picker and the request tries each real model on the chain in order. Use one to cover the hours when a lane is down.',
+        'routing.newChain': 'New chain',
+        'routing.name': 'Name',
+        'routing.namePlaceholder': 'e.g. free first, co-paid second',
+        'routing.strategy': 'Strategy',
+        'routing.strategy.fallback': 'Fallback',
+        'routing.strategy.roundRobin': 'Round-robin',
+        'routing.stickyLimit': 'Round-robin sticky limit',
+        'routing.stickyHint': 'How many calls in a row one model serves before the rotation moves on.',
+        'routing.members': 'Members (in order)',
+        'routing.addMember': 'Add member',
+        'routing.memberEmpty': 'No member yet — press "Add member" to pick one from the roster.',
+        'routing.moveUp': 'Move up',
+        'routing.moveDown': 'Move down',
+        'routing.removeMember': 'Remove',
+        'routing.pickModel': 'Pick a model',
+        'routing.searchModel': 'Search model id or name',
+        'routing.noModel': 'No model matches.',
+        'routing.usable': 'Usable',
+        'routing.notUsable': 'Not usable now',
+        'routing.missing': 'Members not in the roster: {ids}',
+        'routing.notUsableWhy': 'The chain is stored as written and is never rewritten because a lane is closed today; it comes back by itself once those ids are in the roster again. If an id is a typo, edit the chain and fix it.',
+        'routing.resolved': 'Resolves to',
+        'routing.memberCount': '{n} members',
+        'routing.save': 'Save chain',
+        'routing.saved': 'Saved',
+        'routing.savedBody': 'The chain is saved.',
+        'routing.failed': 'Not saved',
+        'routing.loadFailed': 'Cannot read the chain settings',
+        'routing.cancel': 'Cancel',
+        'routing.edit': 'Edit',
+        'routing.delete': 'Delete',
+        'routing.deleteConfirm': 'Confirm delete',
+        'routing.deleteWarn': 'Deleting it drops this model id from the roster immediately; a client still pointing at it gets a 404.',
+        'routing.enabled': 'Enabled',
+        'routing.channel.free': 'Free lane',
+        'routing.channel.eac': 'EAC co-paid',
+        'routing.channel.kilo': 'Kilo',
+        'routing.channel.aggregate': 'Aggregate',
+        'routing.channel.combo': 'Chain',
+        'gw.clientsTitle': 'Connect a client',
+        'gw.clientsHint': 'How the free lane\'s forward port (enabled under "Local forward" on the Free models page) plugs into each client: addresses and keys below are generated from the port that actually bound and the real key.',
+        'gw.clientsOff': 'The forward port is off',
+        'gw.clientsOffHint': 'Enable it under "Local forward" on the Free models page first; only then does this section have a usable address and recipes.',
+        'gw.clientsModels': '{n} servable models',
       },
     }
 
@@ -929,7 +1285,7 @@ window.__ModuleLoader__.load({
    层级约定：layer-3 凹槽/页面底 · layer-2 面板 · layer-1 浮起元素。
    动效约定：transform/opacity 优先；常规 150–300ms、覆盖层 300–400ms。
    ═══════════════════════════════════════════════════════════════════════ */
-.ofm_root{--gap:14px;display:flex;flex-direction:column;gap:calc(var(--gap)*1.4);max-width:1080px;font-size:13px;line-height:1.55;color:var(--dsw-alias-label-primary);-webkit-font-smoothing:antialiased}
+.ofm_root{--ease-instrument:cubic-bezier(.16,1,.3,1);--ease-settle:cubic-bezier(.34,1.4,.4,1);--gap:14px;display:flex;flex-direction:column;gap:calc(var(--gap)*1.4);max-width:1080px;font-size:13px;line-height:1.55;color:var(--dsw-alias-label-primary);-webkit-font-smoothing:antialiased}
 .ofm_root::before{content:"";position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.022;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)'/%3E%3C/svg%3E")}
 .ofm_root>*{position:relative;z-index:1}
 .ofm_root *{box-sizing:border-box}
@@ -1021,9 +1377,9 @@ window.__ModuleLoader__.load({
 .ofm_table tr:last-child td{border-bottom:0}
 .ofm_num{text-align:right}
 /* ══ 按钮（分层状态） ══════════════════════════════════════════════════ */
-.ofm_btn{font:inherit;font-size:12px;font-weight:580;padding:6px 14px;border-radius:9px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 84%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 1px 2px rgb(0 0 0 / 6%);color:var(--dsw-alias-label-primary);cursor:pointer;transition:transform .12s ease,border-color .16s ease,background .16s ease,box-shadow .16s ease,opacity .16s ease}
+.ofm_btn{font:inherit;font-size:12px;font-weight:580;padding:6px 14px;border-radius:9px;border:1px solid var(--dsw-alias-border-l2);background:color-mix(in srgb,var(--dsw-alias-bg-layer-3) 84%,transparent);box-shadow:inset 0 1px 0 rgb(255 255 255 / 5%),0 1px 2px rgb(0 0 0 / 6%);color:var(--dsw-alias-label-primary);cursor:pointer;transition:transform .18s var(--ease-instrument),border-color .2s var(--ease-instrument),background .2s var(--ease-instrument),box-shadow .22s var(--ease-instrument),opacity .16s ease}
 .ofm_btn:hover:not(:disabled){border-color:color-mix(in srgb,var(--dsw-alias-state-business-primary) 62%,var(--dsw-alias-border-l2));background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 7%,var(--dsw-alias-bg-layer-3));transform:translateY(-1px);box-shadow:inset 0 1px 0 rgb(255 255 255 / 7%),0 3px 8px rgb(0 0 0 / 9%)}
-.ofm_btn:active:not(:disabled){transform:scale(.97);box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%)}
+.ofm_btn:active:not(:disabled){transform:scale(.985);transition-duration:.1s;box-shadow:inset 0 1px 0 rgb(255 255 255 / 4%)}
 .ofm_btn:disabled{opacity:.45;cursor:default;box-shadow:none;transform:none}
 .ofm_btn.primary{background:linear-gradient(180deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 88%,#fff),var(--dsw-alias-state-business-primary));border-color:color-mix(in srgb,var(--dsw-alias-state-business-primary) 82%,#000);color:var(--dsw-alias-label-on-accent,#fff);box-shadow:inset 0 1px 0 rgb(255 255 255 / 18%),0 2px 8px color-mix(in srgb,var(--dsw-alias-state-business-primary) 32%,transparent)}
 .ofm_btn.primary:hover:not(:disabled){background:linear-gradient(180deg,var(--dsw-alias-state-business-primary),color-mix(in srgb,var(--dsw-alias-state-business-primary) 88%,#000));border-color:var(--dsw-alias-state-business-primary);box-shadow:inset 0 1px 0 rgb(255 255 255 / 20%),0 4px 14px color-mix(in srgb,var(--dsw-alias-state-business-primary) 42%,transparent)}
@@ -1332,6 +1688,459 @@ window.__ModuleLoader__.load({
 .ofm_btn[aria-busy="true"]::after{content:"";position:absolute;left:50%;top:50%;width:13px;height:13px;margin:-6.5px 0 0 -6.5px;border-radius:50%;border:2px solid color-mix(in srgb,currentColor 30%,var(--dsw-alias-label-secondary));border-top-color:var(--dsw-alias-label-primary);animation:ofm-btn-spin .7s linear infinite}
 @keyframes ofm-btn-spin{to{transform:rotate(360deg)}}
 @media (prefers-reduced-motion:reduce){.ofm_root *,.ofm_root *::before,.ofm_root *::after{animation-duration:.01ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important}}
+/* ═══ 精密仪器精修层（世界观：原厂仪器手感）：颜色听宿主，质感在阻尼。曲线 --ease-instrument 冲得快落得稳，--ease-settle 极轻过冲。退场比进场快。 ═══ */
+.ofm_glass{transition:border-color .22s var(--ease-instrument),box-shadow .26s var(--ease-instrument),transform .22s var(--ease-instrument),background .22s var(--ease-instrument)}
+.ofm_glass:hover{border-color:color-mix(in srgb,var(--dsw-alias-border-l2) 92%,var(--dsw-alias-state-business-primary));box-shadow:0 1px 2px rgb(0 0 0 / 5%),0 10px 28px -14px color-mix(in srgb,var(--dsw-alias-state-business-primary) 18%,transparent)}
+.ofm_kpi{transition:border-color .22s var(--ease-instrument),transform .22s var(--ease-instrument),box-shadow .26s var(--ease-instrument)}
+.ofm_kpi:hover{transform:translateY(-1px)}
+.ofm_kpivalue{transition:transform .3s var(--ease-settle),color .2s var(--ease-instrument);display:inline-block}
+.ofm_kpi:hover .ofm_kpivalue{transform:translateY(-1px) scale(1.015);color:var(--dsw-alias-label-primary)}
+.ofm_table tbody tr{transition:background .14s var(--ease-instrument)}
+.ofm_seg button,.ofm_chip{transition:background .2s var(--ease-instrument),color .2s var(--ease-instrument),border-color .2s var(--ease-instrument),box-shadow .22s var(--ease-settle)}
+.ofm_prog i{transition:width .5s var(--ease-instrument)}
+.ofm_minibtn{transition:transform .14s var(--ease-instrument),border-color .18s var(--ease-instrument),color .18s var(--ease-instrument),background .18s var(--ease-instrument)}
+.ofm_minibtn:active:not(:disabled){transform:scale(.98);transition-duration:.09s}
+.ofm_root input,.ofm_root select,.ofm_root textarea{transition:border-color .18s var(--ease-instrument),box-shadow .2s var(--ease-instrument),background .18s var(--ease-instrument)}
+@media (prefers-reduced-motion:reduce){.ofm_glass,.ofm_kpi,.ofm_kpivalue,.ofm_minibtn,.ofm_prog i{transition:none!important}.ofm_kpi:hover,.ofm_kpi:hover .ofm_kpivalue{transform:none}}
+
+/* ==== V5 INSTRUMENT START ==== */
+/* 精密仪器·样板间覆盖层：1px细边+内高光，无外投影；颜色全部听宿主 var(--dsw-alias-*)。
+   夜(暗)高光更刃、纹理更显；昼(亮)高光收敛、纹理近乎哑。reduced-motion 去位移留状态。 */
+
+/* ── ① 面板卡片 .ofm_panel / .ofm_card ─────────────────────────── */
+/* 双基底：拉丝细纹(repeating-linear-gradient)垫底，实体色覆盖在上，从边缘隐约透出拉丝感 */
+.ofm_root .ofm_panel{
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
+    color-mix(in srgb, var(--dsw-alias-bg-layer-2) 86%, transparent) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%), inset 0 -14px 28px -18px rgb(0 0 0 / 16%) !important;
+  transition: border-color .22s var(--ease-instrument), box-shadow .26s var(--ease-instrument), transform .22s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_card{
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
+    color-mix(in srgb, var(--dsw-alias-bg-layer-3) 84%, transparent) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), inset 0 -12px 24px -16px rgb(0 0 0 / 14%) !important;
+  transition: transform .22s var(--ease-instrument), box-shadow .26s var(--ease-instrument), border-color .2s var(--ease-instrument) !important;
+}
+/* hover：kinetic tension —— 位移压浅(-1px)，去掉外投影，靠边色提亮+高光增强传递"浮起" */
+.ofm_root .ofm_card:hover{
+  transform: translateY(-1px) !important;
+  border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 58%, var(--dsw-alias-border-l2)) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 11%), inset 0 -12px 24px -16px rgb(0 0 0 / 10%) !important;
+}
+
+/* ── ② 按钮 .ofm_btn ─────────────────────────── */
+/* kinetic tension：外壳 active 陷落(scale .985)，内部 ::after 扫光条反向滑过形成"外陷内顶" */
+.ofm_root .ofm_btn{
+  position: relative !important;
+  overflow: hidden !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%) !important;
+  transition: transform .16s var(--ease-settle), border-color .2s var(--ease-instrument), background .2s var(--ease-instrument), box-shadow .2s var(--ease-instrument), opacity .16s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_btn::after{
+  content: "" !important;
+  position: absolute !important;
+  top: 0 !important; bottom: 0 !important;
+  left: -60% !important; width: 42% !important;
+  background: linear-gradient(100deg, transparent, rgb(255 255 255 / 14%), transparent) !important;
+  transform: skewX(-18deg) !important;
+  transition: left .5s var(--ease-instrument) !important;
+  pointer-events: none !important;
+}
+/* hover：扫光滑过（exit slower than press）；去掉原外投影，仅留顶部高光 */
+.ofm_root .ofm_btn:hover:not(:disabled){
+  transform: translateY(-1px) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 10%) !important;
+}
+.ofm_root .ofm_btn:hover:not(:disabled)::after{
+  left: 118% !important;
+}
+/* active：快速陷落(.09s) + 内阴影加深=物理按压；松开靠 --ease-settle 回弹 */
+.ofm_root .ofm_btn:active:not(:disabled){
+  transform: scale(.985) !important;
+  transition-duration: .09s !important;
+  box-shadow: inset 0 2px 5px rgb(0 0 0 / 14%), inset 0 1px 0 rgb(255 255 255 / 3%) !important;
+}
+/* primary 按钮保留主色渐变，仅把外投影换成更克制的内高光+轻凹槽 */
+.ofm_root .ofm_btn.primary{
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 22%), inset 0 -10px 18px -12px rgb(0 0 0 / 24%) !important;
+}
+.ofm_root .ofm_btn.primary:hover:not(:disabled){
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), inset 0 -10px 18px -12px rgb(0 0 0 / 18%) !important;
+}
+
+/* ── ③ 表格行 hover .ofm_table tbody tr ─────────────────────────── */
+/* 行首 2px 主色竖条用 transform:scaleY 展开(不触发布局)；exit(.12s) 比 entrance(.16s) 快 */
+.ofm_root .ofm_table tbody tr{
+  transition: background .16s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_table tbody tr td:first-child{
+  position: relative !important;
+}
+.ofm_root .ofm_table tbody tr td:first-child::before{
+  content: "" !important;
+  position: absolute !important;
+  left: 0 !important; top: 6px !important; bottom: 6px !important;
+  width: 2px !important; border-radius: 2px !important;
+  background: var(--dsw-alias-state-business-primary) !important;
+  transform: scaleY(0) !important;
+  transform-origin: center !important;
+  opacity: 0 !important;
+  transition: transform .16s var(--ease-instrument), opacity .12s var(--ease-instrument) !important;
+  pointer-events: none !important;
+}
+.ofm_root .ofm_table tbody tr:hover td:first-child::before{
+  transform: scaleY(1) !important;
+  opacity: 1 !important;
+}
+/* 数字列表针走格感：tabular-nums + pl5-tick 机械顿挫(steps) */
+.ofm_root .ofm_table td{
+  font-variant-numeric: tabular-nums !important;
+}
+/* 表针走格：离散百分比快照模拟 steps 顿挫——同值连帧=停格，瞬间跳格=机械感；@keyframes 里用不了 steps() 函数，用帧堆出来 */
+@keyframes pl5-tick{
+  0%,24%{ transform: translateY(0); }
+  25%,54%{ transform: translateY(-1.5px); }
+  55%,79%{ transform: translateY(-.75px); }
+  80%,100%{ transform: translateY(0); }
+}
+
+/* ── 昼(not-dark)收敛：高光更哑、拉丝更隐、回弹更小 ─────────────── */
+@media not (prefers-color-scheme: dark){
+  .ofm_root .ofm_panel,
+  .ofm_root .ofm_card{
+    background:
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 2.5px) padding-box,
+      color-mix(in srgb, var(--dsw-alias-bg-layer-2) 90%, transparent) !important;
+  }
+  .ofm_root .ofm_card{
+    background:
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 2.5px) padding-box,
+      color-mix(in srgb, var(--dsw-alias-bg-layer-3) 88%, transparent) !important;
+  }
+  .ofm_root .ofm_panel{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 45%), inset 0 -14px 28px -18px rgb(0 0 0 / 7%) !important;
+  }
+  .ofm_root .ofm_card{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 50%), inset 0 -12px 24px -16px rgb(0 0 0 / 6%) !important;
+  }
+  .ofm_root .ofm_card:hover{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 60%), inset 0 -12px 24px -16px rgb(0 0 0 / 5%) !important;
+  }
+  .ofm_root .ofm_btn{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 50%) !important;
+  }
+  .ofm_root .ofm_btn:hover:not(:disabled){
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 62%) !important;
+  }
+}
+
+/* ── reduced-motion 降级：去位移/回弹/扫光/顿挫，保留颜色与不透明度反馈 ── */
+@media (prefers-reduced-motion: reduce){
+  /* 统一过渡降级：所有交互件只留颜色/不透明度反馈，去位移 */
+  .ofm_root .ofm_card,
+  .ofm_root .ofm_panel,
+  .ofm_root .ofm_btn,
+  .ofm_root .ofm_table tbody tr,
+  .ofm_root .ofm_table tbody tr td:first-child::before,
+  .ofm_root .ofm_switch i,
+  .ofm_root .ofm_switch i::after,
+  .ofm_root .ofm_seg button,
+  .ofm_root .ofm_stat,
+  .ofm_root .ofm_kvc,
+  .ofm_root .ofm_input,
+  .ofm_root .ofm_starbtn,
+  .ofm_root .ofm_chanlogo{
+    transition: border-color .12s ease, background .12s ease, box-shadow .12s ease, opacity .12s ease, color .12s ease !important;
+  }
+  /* 去位移/回弹/陷落 */
+  .ofm_root .ofm_card:hover,
+  .ofm_root .ofm_btn:hover:not(:disabled),
+  .ofm_root .ofm_btn:active:not(:disabled),
+  .ofm_root .ofm_stat:hover,
+  .ofm_root .ofm_kvc:hover,
+  .ofm_root .ofm_seg button:active:not([aria-pressed="true"]),
+  .ofm_root .ofm_starbtn:active,
+  .ofm_root .ofm_chan:hover .ofm_chanlogo{
+    transform: none !important;
+  }
+  /* 开关捏扁还原 */
+  .ofm_root .ofm_switch:active i::after{
+    width: 14px !important;
+  }
+  /* 扫光条砍掉 */
+  .ofm_root .ofm_btn::after,
+  .ofm_root .ofm_starbtn::after{
+    content: none !important;
+  }
+  /* 呼吸灯停跳，但保留颜色状态 */
+  .ofm_root .ofm_dot.ok{
+    animation: none !important;
+    opacity: 1 !important;
+  }
+  /* 表针走格动画停走，但保留数字本身 */
+  .ofm_root .ofm_kpi:hover .ofm_kpivalue,
+  .ofm_root .ofm_stat:hover b{
+    animation: none !important;
+  }
+}
+
+/* ── ④ 输入框 .ofm_input：仪器凹槽手感 ─────────────────────────── */
+/* 常态凹槽(inset 顶高光+底内阴影)；focus 时凹槽不动，只换边色+外发光，像仪器被点亮 */
+.ofm_root .ofm_input{
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), inset 0 2px 6px -2px rgb(0 0 0 / 10%) !important;
+  transition: border-color .18s var(--ease-instrument), box-shadow .2s var(--ease-instrument), background .18s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_input:hover{
+  border-color: color-mix(in srgb, var(--dsw-alias-border-l2) 55%, var(--dsw-alias-state-business-primary)) !important;
+}
+.ofm_root .ofm_input:focus{
+  border-color: var(--dsw-alias-state-business-primary) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%), inset 0 2px 6px -2px rgb(0 0 0 / 8%), 0 0 0 3px color-mix(in srgb, var(--dsw-alias-state-business-primary) 16%, transparent) !important;
+}
+
+/* ── ⑤ 开关 .ofm_switch：spring 滑块阻尼 ─────────────────────────── */
+/* 滑块用 --ease-settle 带回弹；按下时滑块变宽=被"捏扁"，松开回弹归位 */
+.ofm_root .ofm_switch i{
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 10%), inset 0 -1px 0 rgb(255 255 255 / 4%) !important;
+  transition: background .22s var(--ease-instrument), border-color .22s var(--ease-instrument), box-shadow .22s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_switch i::after{
+  background: var(--dsw-alias-label-primary) !important;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 28%), inset 0 1px 0 rgb(255 255 255 / 20%) !important;
+  transition: transform .28s var(--ease-settle), background .2s var(--ease-instrument), width .14s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_switch[aria-checked="true"] i{
+  box-shadow: inset 0 1px 3px rgb(0 0 0 / 14%), inset 0 -1px 0 rgb(255 255 255 / 8%) !important;
+}
+.ofm_root .ofm_switch[aria-checked="true"] i::after{
+  background: var(--dsw-alias-label-on-accent, #fff) !important;
+}
+.ofm_root .ofm_switch:active i::after{
+  width: 17px !important;
+}
+
+/* ── ⑥ 徽章/药丸/标签 .ofm_badge/.ofm_pill/.ofm_tag/.ofm_chantag/.ofm_chip ── */
+/* 统一加顶部发丝高光；状态色只用 color-mix 调透明度，不换色相 */
+.ofm_root .ofm_pill,
+.ofm_root .ofm_tag,
+.ofm_root .ofm_chip,
+.ofm_root .ofm_chantag{
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 5%) !important;
+  transition: border-color .2s var(--ease-instrument), color .2s var(--ease-instrument), background .2s var(--ease-instrument), transform .18s var(--ease-settle) !important;
+}
+.ofm_root .ofm_badge{
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 6%) !important;
+  transition: border-color .2s var(--ease-instrument), color .2s var(--ease-instrument), background .2s var(--ease-instrument) !important;
+}
+/* 状态点呼吸灯保留，但改成 pl5- 前缀、机械顿挫更明显的两拍节奏 */
+@keyframes pl5-dot-breathe{
+  0%,100%{ opacity:1; }
+  50%{ opacity:.45; }
+}
+.ofm_root .ofm_dot.ok{
+  animation: pl5-dot-breathe 2.4s cubic-bezier(.4,0,.6,1) infinite !important;
+}
+/* 分段控件选中块：加顶部高光，按下时微微陷落 */
+.ofm_root .ofm_seg button[aria-pressed="true"]{
+  box-shadow: 0 1px 3px rgb(0 0 0 / 10%), inset 0 1px 0 rgb(255 255 255 / 8%) !important;
+  transition: color .18s var(--ease-instrument), background .18s var(--ease-instrument), box-shadow .2s var(--ease-settle) !important;
+}
+.ofm_root .ofm_seg button:active:not([aria-pressed="true"]){
+  transform: scale(.97) !important;
+}
+
+/* ── ⑦ 原生件接管：滚动条 / selection / caret / 聚焦环 ─────────────── */
+/* 滚动条：仪器滑轨——thumb 加顶部高光与底部凹槽，hover 时轻微增亮 */
+.ofm_root ::-webkit-scrollbar-thumb{
+  background: color-mix(in srgb, var(--dsw-alias-label-tertiary) 30%, transparent) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%), inset 0 -1px 0 rgb(0 0 0 / 10%) !important;
+  transition: background .2s var(--ease-instrument) !important;
+}
+.ofm_root ::-webkit-scrollbar-thumb:hover{
+  background: color-mix(in srgb, var(--dsw-alias-label-tertiary) 48%, transparent) !important;
+}
+/* 文本选择：主色薄涂，昼模式再淡一点避免刺眼 */
+.ofm_root ::selection{
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 20%, transparent) !important;
+}
+/* 光标：跟随主色 */
+.ofm_root input, .ofm_root textarea{
+  caret-color: var(--dsw-alias-state-business-primary) !important;
+}
+/* 聚焦环：仪器刻度环——细环+外晕，用 --ease-instrument 淡入 */
+.ofm_root :focus-visible{
+  outline: 2px solid color-mix(in srgb, var(--dsw-alias-state-business-primary) 72%, transparent) !important;
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dsw-alias-state-business-primary) 10%, transparent) !important;
+  transition: box-shadow .18s var(--ease-instrument), outline-color .18s var(--ease-instrument) !important;
+}
+
+/* ── ⑧【师傅批改①】拉丝纹理增强：金属感要真的能摸到 ─────────────── */
+/* 夜模式 3% → 4.5%，昼模式 1.5% → 2.8%，纹理间隔收紧让拉丝更密 */
+.ofm_root .ofm_panel{
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
+    color-mix(in srgb, var(--dsw-alias-bg-layer-2) 86%, transparent) !important;
+}
+.ofm_root .ofm_card{
+  background:
+    repeating-linear-gradient(115deg, rgb(255 255 255 / 4.5%) 0 1px, transparent 1px 2.5px) padding-box,
+    color-mix(in srgb, var(--dsw-alias-bg-layer-3) 84%, transparent) !important;
+}
+@media not (prefers-color-scheme: dark){
+  .ofm_root .ofm_panel,
+  .ofm_root .ofm_card{
+    background:
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 2.5px) padding-box,
+      color-mix(in srgb, var(--dsw-alias-bg-layer-2) 90%, transparent) !important;
+  }
+  .ofm_root .ofm_card{
+    background:
+      repeating-linear-gradient(115deg, rgb(255 255 255 / 4%) 0 1px, transparent 1px 2.5px) padding-box,
+      color-mix(in srgb, var(--dsw-alias-bg-layer-3) 88%, transparent) !important;
+  }
+}
+
+/* ── ⑧【师傅批改②】昼模式高光压暗：45-62% → 30-38%，更克制 ─────────── */
+@media not (prefers-color-scheme: dark){
+  .ofm_root .ofm_panel{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%), inset 0 -14px 28px -18px rgb(0 0 0 / 6%) !important;
+  }
+  .ofm_root .ofm_card{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 38%), inset 0 -12px 24px -16px rgb(0 0 0 / 5%) !important;
+  }
+  .ofm_root .ofm_card:hover{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 42%), inset 0 -12px 24px -16px rgb(0 0 0 / 4%) !important;
+  }
+  .ofm_root .ofm_btn{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 36%) !important;
+  }
+  .ofm_root .ofm_btn:hover:not(:disabled){
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 44%) !important;
+  }
+  .ofm_root .ofm_pill,
+  .ofm_root .ofm_tag,
+  .ofm_root .ofm_chip,
+  .ofm_root .ofm_chantag,
+  .ofm_root .ofm_badge{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%) !important;
+  }
+  .ofm_root .ofm_input{
+    box-shadow: inset 0 1px 0 rgb(255 255 255 / 34%), inset 0 2px 6px -2px rgb(0 0 0 / 6%) !important;
+  }
+}
+
+/* ── ⑧【师傅批改③】表格竖条语言统一：所有表格行 hover 都带主色竖条 ── */
+/* .ofm_newsbody table 是内容型表格，保持朴素；仅给数据表 .ofm_table 统一竖条。
+   同时把 .ofm_kvc / .ofm_stat 等"类表格"卡片也纳入 hover 微提亮，保持语言一致 */
+.ofm_root .ofm_stat,
+.ofm_root .ofm_kvc{
+  transition: border-color .2s var(--ease-instrument), box-shadow .22s var(--ease-instrument), transform .2s var(--ease-settle) !important;
+}
+.ofm_root .ofm_stat:hover,
+.ofm_root .ofm_kvc:hover{
+  border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 38%, var(--dsw-alias-border-l1)) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%) !important;
+  transform: translateY(-1px) !important;
+}
+
+/* ── ⑩【返工·收编租界】星按钮/导航标/渠道标 全部听宿主变量 ─────────────── */
+/* L1130 .ofm_starbtn:hover 混 #3ECFA0、L1181 .ofm_navmark 混 #3ECFA0 —— 统一改混 label-primary，零品牌色 */
+.ofm_root .ofm_starbtn{
+  transition: transform .16s var(--ease-settle), box-shadow .2s var(--ease-instrument), color .2s var(--ease-instrument), background .2s var(--ease-instrument) !important;
+}
+.ofm_root .ofm_starbtn:hover{
+  background: linear-gradient(140deg, var(--dsw-alias-state-business-primary), color-mix(in srgb, var(--dsw-alias-state-business-primary) 76%, var(--dsw-alias-label-primary))) !important;
+  color: var(--dsw-alias-label-on-accent, #fff) !important;
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--dsw-alias-state-business-primary) 10%, transparent), 0 6px 16px color-mix(in srgb, var(--dsw-alias-state-business-primary) 22%, transparent) !important;
+}
+.ofm_root .ofm_starbtn:active{
+  transform: scale(.97) !important;
+}
+/* 扫光条改走 --ease-instrument，与 .ofm_btn 同语言 */
+.ofm_root .ofm_starbtn::after{
+  transition: left .5s var(--ease-instrument) !important;
+}
+/* 导航标：去掉 #3ECFA0 混色，改混 label-primary；外投影换成内高光+轻凹槽 */
+.ofm_root .ofm_navmark{
+  background: linear-gradient(145deg, var(--dsw-alias-state-business-primary), color-mix(in srgb, var(--dsw-alias-state-business-primary) 58%, var(--dsw-alias-label-primary))) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 26%), inset 0 -6px 12px -8px rgb(0 0 0 / 20%) !important;
+}
+.ofm_root .ofm_navmark svg{
+  fill: var(--dsw-alias-label-on-accent, #fff) !important;
+}
+/* 渠道标：--chan-accent 兜底本来就是宿主变量，收编写死的 #fff / #101828，外投影换内高光 */
+.ofm_root .ofm_chanlogo{
+  color: var(--dsw-alias-label-on-accent, #fff) !important;
+  background: linear-gradient(150deg, var(--chan-accent, var(--dsw-alias-state-business-primary)), color-mix(in srgb, var(--chan-accent, var(--dsw-alias-state-business-primary)) 52%, var(--dsw-alias-bg-layer-3))) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 24%), inset 0 -8px 14px -10px rgb(0 0 0 / 22%) !important;
+  transition: transform .3s var(--ease-settle) !important;
+}
+.ofm_root .ofm_chan:hover .ofm_chanlogo{
+  transform: scale(1.05) rotate(-2deg) !important;
+}
+
+/* ── ⑩【返工·收编 SEASON 落地件】色板/选中 chip/渠道卡顶条 ─────────────── */
+/* SEASON 数组在 JS(L1663) 里、靠内联 style 注入，CSS 改不了值；
+   收编它落地的元素，让质感听宿主：色板加高光、chip 选中不再花、渠道卡顶条收敛 */
+.ofm_root .ofm_swatch{
+  border-radius: 3px !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 30%), inset 0 -1px 0 rgb(0 0 0 / 16%) !important;
+}
+/* chip 选中态：JS 注入彩色背景，这里压回宿主语言——主色薄涂+主色边，去掉杂色 */
+.ofm_root .ofm_chip[aria-pressed="true"]{
+  background: color-mix(in srgb, var(--dsw-alias-state-business-primary) 14%, transparent) !important;
+  border-color: color-mix(in srgb, var(--dsw-alias-state-business-primary) 55%, transparent) !important;
+  color: var(--dsw-alias-state-business-primary) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 8%) !important;
+}
+/* 渠道卡顶条(::before 用 --chan-accent)：收敛高度与发光，听宿主凹槽语言 */
+.ofm_root .ofm_chan::before{
+  height: 2px !important;
+  box-shadow: 0 1px 0 rgb(255 255 255 / 6%) !important;
+}
+.ofm_root .ofm_chan[data-state="on"]{
+  border-color: color-mix(in srgb, var(--chan-accent, var(--dsw-alias-state-business-primary)) 30%, var(--dsw-alias-border-l2)) !important;
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 7%) !important;
+}
+
+/* ── ⑩【返工·接上 pl5-tick】KPI/统计数字获得表针走格感 ─────────────── */
+/* 挂到 KPI 大数字与统计卡数字：hover 时数字以机械顿挫走一格，模拟仪表指针跳动 */
+.ofm_root .ofm_kpivalue,
+.ofm_root .ofm_stat b{
+  display: inline-block !important;
+}
+.ofm_root .ofm_kpi:hover .ofm_kpivalue,
+.ofm_root .ofm_stat:hover b{
+  animation: pl5-tick .34s var(--ease-instrument) 1 !important;
+}
+/* ==== V5 INSTRUMENT END ==== */
+/* ── 聚合渠道 / 省 Token / 路由：新页面的表面 ─────────────────────────────
+   动效一律走 150–250ms 的短过渡，不弹跳；reduced-motion 下由文件末尾的
+   媒体查询整体关掉。ofm_rise 用 backwards 而不是 both：动画结束后元素回到
+   样式表里的 transform，卡片的 hover 抬升才不会被动画的终态钉死。 */
+.ofm_rise{animation:ofmrisein .22s cubic-bezier(.22,.61,.36,1) backwards}
+@keyframes ofmrisein{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+.ofm_duo{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(272px,100%),1fr));gap:12px;align-items:start}
+.ofm_duo>*{min-width:0}
+.ofm_picklist{display:grid;grid-template-columns:repeat(auto-fill,minmax(228px,1fr));gap:8px;max-height:330px;overflow:auto;padding:2px}
+.ofm_pickrow{display:flex;flex-direction:column;gap:5px;align-items:stretch;text-align:left;font:inherit;padding:9px 11px;border-radius:11px;border:1px solid var(--dsw-alias-border-l1);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 62%,transparent);color:var(--dsw-alias-label-primary);cursor:pointer;transition:border-color .16s ease,background .16s ease,transform .16s ease}
+.ofm_pickrow:hover:not(:disabled){border-color:var(--dsw-alias-state-business-primary);transform:translateY(-1px)}
+.ofm_pickrow[aria-pressed="true"]{border-color:var(--dsw-alias-state-business-primary);background:color-mix(in srgb,var(--dsw-alias-state-business-primary) 12%,transparent)}
+.ofm_pickrow:disabled{opacity:.55;cursor:default}
+.ofm_pickhead{display:flex;align-items:center;gap:7px;min-width:0}
+.ofm_pickhead b{font-size:12.5px;font-weight:650;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ofm_pickmeta{display:flex;gap:7px;flex-wrap:wrap;font-size:10.5px;color:var(--dsw-alias-label-tertiary);min-width:0}
+.ofm_picknote{font-size:10.5px;line-height:1.5;color:var(--dsw-alias-label-tertiary);overflow-wrap:anywhere}
+.ofm_meter{height:9px;border-radius:99px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);overflow:hidden}
+.ofm_meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,color-mix(in srgb,var(--dsw-alias-state-business-primary) 62%,transparent),var(--dsw-alias-state-business-primary));transition:width .55s cubic-bezier(.22,.61,.36,1)}
+.ofm_member{display:flex;align-items:center;gap:8px;padding:6px 9px;border-radius:10px;border:1px solid color-mix(in srgb,var(--dsw-alias-border-l1) 82%,transparent);background:color-mix(in srgb,var(--dsw-alias-bg-layer-1) 58%,transparent);font-size:11.5px;transition:border-color .16s ease,background .16s ease}
+.ofm_member .ofm_id{flex:1;min-width:0}
+.ofm_snippet{margin:0;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;line-height:1.6;padding:9px 11px;border-radius:10px;background:var(--dsw-alias-bg-layer-1);border:1px solid var(--dsw-alias-border-l1);color:var(--dsw-alias-label-secondary);white-space:pre;overflow:auto;max-height:230px}
+@media (max-width:600px){.ofm_duo{grid-template-columns:1fr}.ofm_picklist{grid-template-columns:1fr}.ofm_member{flex-wrap:wrap}}
+@media (prefers-reduced-motion:reduce){.ofm_rise,.ofm_page{animation:none}.ofm_pickrow,.ofm_member,.ofm_meter i,.ofm_card,.ofm_kpi,.ofm_chan{transition:none}.ofm_root .ofm_card:hover,.ofm_pickrow:hover:not(:disabled){transform:none}}
 `
 
     // ── helpers ───────────────────────────────────────────────────────────────
@@ -1797,6 +2606,11 @@ window.__ModuleLoader__.load({
       className: 'ofm_switch',
       role: 'switch',
       'aria-checked': props.checked ? 'true' : 'false',
+      // Several call sites already pass `disabled` (the gateway switch does, while
+      // its RPC is in flight) and it was silently dropped, so a switch stayed
+      // clickable through a write it could not survive. Passing it through is what
+      // those call sites meant.
+      disabled: props.disabled === true,
       onClick: props.onChange,
     }, h('i'), props.label === undefined ? null : h('span', null, props.label))
 
@@ -3529,7 +4343,11 @@ window.__ModuleLoader__.load({
       const cumulative = ledger.totals ?? ledger.snapshot?.totals ?? {}
       const accounts = ledgerAccountRows(channels)
       const models = ledgerModelRows(channels).sort((a, b) => (b.inputTokens + b.outputTokens) - (a.inputTokens + a.outputTokens))
-      const entries = (ledger.snapshot?.entries ?? []).slice().reverse()
+      // The pack's ring is already newest-first (`token-ledger.ts`: "最近明细
+      // （最新在前）", built with `unshift`), so it is used as served. Reversing it
+      // here put the oldest request at the top of the table — and, behind the log
+      // page's pagination, the request the user just made on the last page.
+      const entries = ledger.snapshot?.entries ?? []
       const tokenTotal = totals.inputTokens + totals.outputTokens
       const cacheBase = totals.inputTokens + totals.cacheReadTokens
 
@@ -3648,7 +4466,8 @@ window.__ModuleLoader__.load({
         const timer = setInterval(() => { void reload() }, 10_000)
         return () => clearInterval(timer)
       }, [auto, reload])
-      const entries = (ledger.snapshot?.entries ?? []).slice().reverse()
+      // Newest first, as the pack serves it — see the note in LedgerPage.
+      const entries = ledger.snapshot?.entries ?? []
       const pages = Math.max(1, Math.ceil(entries.length / pageSize))
       const [page, setPage] = useState(1)
       const safePage = Math.min(page, pages)
@@ -3717,6 +4536,10 @@ window.__ModuleLoader__.load({
       const [relay, setRelay] = useState(undefined)
       const [relayKey, setRelayKey] = useState('')
       const [relayBusy, setRelayBusy] = useState(false)
+      // 免费车道转发端口的接入配方。它和上面这块网关是两条独立监听：这里的地址与
+      // 密钥由宿主按实际绑定的端口生成，端口没开就只给一句说明而不是一堆会骗人的
+      // 配方（未启用时 /clients 回的是占位端口与占位 Key）。
+      const clients = usePanel(() => api('/clients'), [])
 
       const loadGateway = useCallback(async () => {
         if (!available) return
@@ -3814,7 +4637,38 @@ window.__ModuleLoader__.load({
                   onClick: async () => { try { setRelayKey((await post('/chan-gateway/rotate')).key ?? '') } catch (error) { setNotice(String(error?.message ?? error)) } },
                 }, t('gw.rotate'))),
               h('p', { className: 'ofm_note' }, t('gw.relayNote')),
-              h('p', { className: 'ofm_note' }, t('gw.freeLaneNote')))))
+              h('p', { className: 'ofm_note' }, t('gw.freeLaneNote')))),
+        h(Section, { title: t('gw.clientsTitle'), hint: t('gw.clientsHint') },
+          clients.status === 'loading' ? h('div', { className: 'ofm_skel', style: { minHeight: 96 } })
+            : clients.status === 'error'
+              ? h(PanelError, { t, title: t('gw.clientsTitle'), message: clients.error, onRetry: clients.reload })
+              // The recipes are generated from the port that actually bound, so a
+              // listener that is off has nothing honest to print: the route answers
+              // with a placeholder port and a placeholder key, and a pasted
+              // placeholder is a client that silently fails to connect.
+              : clients.data?.running !== true
+                ? h('div', { className: 'ofm_callout ofm_rise' },
+                  h('div', null, h('b', null, t('gw.clientsOff')), h('div', null, t('gw.clientsOffHint'))))
+                : h('div', { className: 'ofm_panel ofm_rise' },
+                  h('div', { className: 'ofm_row' },
+                    h('span', { className: 'ofm_note' }, t('forward.baseUrl')),
+                    h('code', { className: 'ofm_mono' }, clients.data.baseUrl),
+                    h(CopyButton, { t, text: clients.data.baseUrl }),
+                    h('span', { className: 'ofm_note' }, t('gw.clientsModels').replace('{n}', String((clients.data.models ?? []).length)))),
+                  clients.data.lanUrl === '' ? null
+                    : h('div', { className: 'ofm_row' },
+                      h('span', { className: 'ofm_note' }, t('forward.lanUrl')),
+                      h('code', { className: 'ofm_mono' }, clients.data.lanUrl),
+                      h(CopyButton, { t, text: clients.data.lanUrl })),
+                  h('div', { className: 'ofm_duo' }, (clients.data.snippets ?? []).map((snippet, index) => h('div', {
+                    key: snippet.id, className: 'ofm_card ofm_rise',
+                    style: { animationDelay: `${Math.min(index, 8) * 22}ms` },
+                  },
+                  h('div', { className: 'ofm_cardhead' },
+                    h('span', { className: 'ofm_cardname' }, snippet.name),
+                    h('span', { className: 'ofm_tag' }, snippet.language)),
+                  h('pre', { className: 'ofm_snippet' }, snippet.body),
+                  h('div', { className: 'ofm_row' }, h(CopyButton, { t, text: snippet.body }))))))))
     }
 
     /** Shared page hero for the three gateway-console pages. The caller
@@ -3827,6 +4681,879 @@ window.__ModuleLoader__.load({
             h('h2', null, title),
             h('p', { className: 'ofm_pagesub' }, sub)),
           children))
+    }
+
+    // ── 聚合渠道 / 省 Token / 路由 ─────────────────────────────────────────────
+    /**
+     * One panel fetch per page, plus the merge for what a write answers with.
+     *
+     * `useAsync` above re-reads the whole payload after a write. These three
+     * pages must not do that: every control's POST already answers with the state
+     * the host stored, and a re-read would either double the round trips or open a
+     * window where a switch shows what was *clicked* rather than what was saved.
+     * So the payload lives here and the caller merges the POST answer in through
+     * `patch`. The shimmer is for the first answer only — a reload after a write
+     * keeps the current panel on screen instead of collapsing it back.
+     */
+    function usePanel(loader, deps) {
+      const [state, setState] = useState({ status: 'loading', data: undefined, error: '' })
+      const run = useCallback(() => {
+        let alive = true
+        setState(current => ({ status: current.data === undefined ? 'loading' : 'ready', data: current.data, error: '' }))
+        loader()
+          .then(data => { if (alive) setState({ status: 'ready', data, error: '' }) })
+          .catch(error => {
+            if (!alive) return
+            setState(current => current.data === undefined
+              ? { status: 'error', data: undefined, error: String(error?.message ?? error) }
+              : { status: 'ready', data: current.data, error: String(error?.message ?? error) })
+          })
+        return () => { alive = false }
+      }, deps)
+      useEffect(() => run(), [run])
+      const patch = useCallback(update => setState(current => current.data === undefined
+        ? current
+        : { ...current, data: typeof update === 'function' ? update(current.data) : { ...current.data, ...update } }), [])
+      return { ...state, reload: run, patch }
+    }
+
+    /** First-fetch placeholder: three shimmering cards, not one grey line. */
+    function PanelSkeleton() {
+      return h('div', { className: 'ofm_grid', 'aria-hidden': 'true' },
+        h('div', { className: 'ofm_skel' }), h('div', { className: 'ofm_skel' }), h('div', { className: 'ofm_skel' }))
+    }
+
+    /**
+     * A load failure that names what failed and offers the retry.
+     *
+     * The older pages render nothing at all when a route refuses, which reads as
+     * "this plugin has no such feature". Each of the three new pages passes its
+     * own title, because "cannot read the provider registry" and "cannot read the
+     * chain settings" are different sentences to act on.
+     */
+    function PanelError(props) {
+      const { t, title, message, onRetry } = props
+      return h('div', { className: 'ofm_callout ofm_error ofm_rise' },
+        h('div', { style: { flex: 1, minWidth: 0 } },
+          h('b', null, title),
+          h('div', null, message)),
+        h(Button, { kind: 'ghost', onClick: onRetry }, t('retry')))
+    }
+
+    /** Copy-to-clipboard that answers the click, so a copy is never silent. */
+    function CopyButton(props) {
+      const { t, text } = props
+      const [done, setDone] = useState(false)
+      useEffect(() => {
+        if (!done) return
+        const timer = setTimeout(() => setDone(false), 1400)
+        return () => clearTimeout(timer)
+      }, [done])
+      return h(Button, {
+        kind: 'ghost',
+        onClick: () => copy(text, ok => { if (ok) setDone(true) }),
+      }, done ? t('eac.copied') : t('eac.copy'))
+    }
+
+    /** A switch with its one-line explanation underneath. */
+    function ToggleRow(props) {
+      const { label, hint, checked, disabled, onChange } = props
+      return h('div', { className: 'ofm_field' },
+        h(Switch, { checked, label, disabled, onChange }),
+        hint === undefined ? null : h('span', null, hint))
+    }
+
+    // Labels for the ids the host serves. Literal t() calls inside an object
+    // literal rather than a key table, because a key the copy lint cannot see is
+    // a key it reports as unused (the same shape the pool-reason table uses).
+    const AGG_CATEGORY = t => ({
+      apikey: t('agg.category.apikey'),
+      free: t('agg.category.free'),
+      'free-tier': t('agg.category.freeTier'),
+      local: t('agg.category.local'),
+      oauth: t('agg.category.oauth'),
+    })
+    const AGG_AUTH = t => ({
+      apiKey: t('agg.auth.apiKey'),
+      none: t('agg.auth.none'),
+      oauth: t('agg.auth.oauth'),
+      adc: t('agg.auth.adc'),
+    })
+    const SAVER_LEVEL = t => ({
+      off: t('saver.level.off'),
+      lite: t('saver.level.lite'),
+      full: t('saver.level.full'),
+      ultra: t('saver.level.ultra'),
+      'wenyan-lite': t('saver.level.wenyanLite'),
+      wenyan: t('saver.level.wenyan'),
+      'wenyan-ultra': t('saver.level.wenyanUltra'),
+    })
+    const LANE_LABEL = t => ({
+      free: t('routing.channel.free'),
+      eac: t('routing.channel.eac'),
+      kilo: t('routing.channel.kilo'),
+      aggregate: t('routing.channel.aggregate'),
+      combo: t('routing.channel.combo'),
+    })
+
+    /**
+     * Auth kinds this lane cannot drive.
+     *
+     * `oauth` needs an interactive login and `adc` a cloud-side credential, so
+     * the aggregate lane skips them when it builds the catalog. Offering one in
+     * the picker would be offering a provider whose key field can never work, so
+     * they are shown and marked instead of hidden — "this exists and this lane
+     * will not call it" is the honest sentence.
+     */
+    const AGG_UNUSABLE = new Set(['oauth', 'adc'])
+
+    /** `a, b` / `a\nb` -> `['a','b']`, the shape POST /providers stores. */
+    const parseModelIds = value => String(value ?? '').split(/[\n,]+/).map(part => part.trim()).filter(part => part !== '')
+
+    /** How many catalog rows one provider contributes right now, read from
+     *  /summary: "configured" must never imply "in the model picker". */
+    const contributedBy = (catalog, providerId) => (catalog ?? [])
+      .filter(row => row.channel === 'aggregate' && row.providerId === providerId).length
+
+    const miniBtn = (label, onClick, options = {}) => h('button', {
+      type: 'button',
+      className: 'ofm_minibtn' + (options.danger === true ? ' danger' : ''),
+      disabled: options.disabled === true,
+      title: options.title,
+      onClick,
+    }, label)
+
+    /**
+     * The add-provider picker: the whole registry, filtered.
+     *
+     * Every row carries what the decision needs — category, wire format, auth
+     * kind, how many models ship with it, where to get a key and the free-tier
+     * note — because "which of these 76 is worth a key" is the actual question.
+     * Rows are capped; the counts say how many matched.
+     */
+    function ProviderPicker(props) {
+      const { t, registry, onPick } = props
+      const [query, setQuery] = useState('')
+      const [category, setCategory] = useState('')
+      const [format, setFormat] = useState('')
+      const [auth, setAuth] = useState('')
+      const categories = AGG_CATEGORY(t)
+      const auths = AGG_AUTH(t)
+      const needle = query.trim().toLowerCase()
+      const matched = registry.filter(row => {
+        if (category !== '' && row.category !== category) return false
+        if (format !== '' && row.format !== format) return false
+        if (auth !== '' && row.authKind !== auth) return false
+        if (needle === '') return true
+        return `${row.id} ${row.name}`.toLowerCase().includes(needle)
+      })
+      const shown = matched.slice(0, 48)
+      const formats = [...new Set(registry.map(row => row.format))].sort()
+      return h('div', { className: 'ofm_panel ofm_rise' },
+        h('div', { className: 'ofm_paneltitle' }, t('agg.addTitle'),
+          h('span', { className: 'ofm_sec_hint' }, t('agg.showing').replace('{shown}', String(shown.length)).replace('{total}', String(matched.length)))),
+        h('div', { className: 'ofm_row' },
+          h('div', { className: 'ofm_field', style: { flex: '1 1 180px' } },
+            h('span', null, t('agg.search')),
+            h('input', { className: 'ofm_input', value: query, placeholder: t('agg.search'), onChange: event => setQuery(event.target.value) })),
+          h('div', { className: 'ofm_field' }, h('span', null, t('agg.filterCategory')),
+            h('select', { className: 'ofm_input', value: category, onChange: event => setCategory(event.target.value) },
+              h('option', { value: '' }, t('agg.filterAll')),
+              Object.keys(categories).map(id => h('option', { key: id, value: id }, categories[id])))),
+          h('div', { className: 'ofm_field' }, h('span', null, t('agg.filterFormat')),
+            h('select', { className: 'ofm_input', value: format, onChange: event => setFormat(event.target.value) },
+              h('option', { value: '' }, t('agg.filterAll')),
+              formats.map(id => h('option', { key: id, value: id }, id)))),
+          h('div', { className: 'ofm_field' }, h('span', null, t('agg.filterAuth')),
+            h('select', { className: 'ofm_input', value: auth, onChange: event => setAuth(event.target.value) },
+              h('option', { value: '' }, t('agg.filterAll')),
+              Object.keys(auths).map(id => h('option', { key: id, value: id }, auths[id]))))),
+        h('p', { className: 'ofm_note' }, t('agg.addHint')),
+        shown.length === 0
+          ? h('p', { className: 'ofm_note' }, t('agg.noMatch'))
+          : h('div', { className: 'ofm_picklist' }, shown.map((row, index) => {
+            const blocked = AGG_UNUSABLE.has(row.authKind)
+            return h('div', {
+              key: row.id, className: 'ofm_pickrow ofm_rise',
+              style: { animationDelay: `${Math.min(index, 12) * 18}ms` },
+            },
+            h('span', { className: 'ofm_pickhead' },
+              h('b', { title: row.name }, row.name),
+              blocked ? h('span', { className: 'ofm_tagpill dead' }, t('agg.notUsable')) : null),
+            h('span', { className: 'ofm_pickmeta' },
+              h('span', { className: 'ofm_tag' }, categories[row.category] ?? row.category),
+              h('span', { className: 'ofm_tag' }, row.format),
+              h('span', { className: 'ofm_tag' }, auths[row.authKind] ?? row.authKind),
+              h('span', null, t('agg.modelCount').replace('{n}', String(row.modelCount)))),
+            blocked
+              ? h('span', { className: 'ofm_picknote' }, t('agg.notUsableWhy').replace('{kind}', auths[row.authKind] ?? row.authKind))
+              : h('span', { className: 'ofm_row' },
+                row.credentialUrl === '' ? null
+                  : h('a', { className: 'ofm_starlink', href: row.credentialUrl, target: '_blank', rel: 'noreferrer' }, t('agg.credential')),
+                miniBtn(t('agg.select'), () => onPick(row))),
+            row.notes === '' ? null : h('span', { className: 'ofm_picknote' }, row.notes))
+          })))
+    }
+
+    /**
+     * One provider's editor, shared by "configure" and "add".
+     *
+     * The key box starts empty on purpose and an empty box means *keep*: the host
+     * distinguishes an absent field from an empty string, and conflating them is
+     * what silently kept a key the user believed they had deleted. Deleting one
+     * is therefore its own button, and it says what it does.
+     */
+    function ProviderEditor(props) {
+      const { t, provider, state, contributions, onSaved, onRemoved, onChanged, showContributions = true } = props
+      const fresh = state === undefined
+      const [enabled, setEnabled] = useState(state?.enabled !== false)
+      const [baseUrl, setBaseUrl] = useState(state?.baseUrl ?? '')
+      const [key, setKey] = useState('')
+      const [models, setModels] = useState((state?.models ?? []).join(', '))
+      const [verdict, setVerdict] = useState(state?.lastTest ?? null)
+      const [found, setFound] = useState(null)
+      const [confirm, setConfirm] = useState(false)
+      const [busy, setBusy] = useState('')
+      const [error, setError] = useState('')
+
+      const run = async (kind, action) => {
+        setBusy(kind)
+        setError('')
+        try { await action() } catch (failure) { setError(String(failure?.message ?? failure)) } finally { setBusy('') }
+      }
+      const save = () => run('save', async () => {
+        const body = { providerId: provider.id, enabled, baseUrl, models: parseModelIds(models) }
+        if (key !== '') body.apiKey = key
+        const answer = await post('/providers', body)
+        setKey('')
+        onSaved(answer.aggregate, provider, fresh)
+      })
+      const clearKey = () => run('clear', async () => {
+        const answer = await post('/providers', { providerId: provider.id, apiKey: '' })
+        setKey('')
+        onSaved(answer.aggregate, provider, false)
+      })
+      const test = () => run('test', async () => {
+        // A listing probe, not a generation: the host verifies the key by asking
+        // for the model list, so this costs no tokens. `status: 0` with ok:false
+        // is its own verdict — "cannot be verified without spending a
+        // generation" — and reads as a warning, not as a rejected key.
+        const answer = await post('/providers/test', { providerId: provider.id }, 60_000)
+        setVerdict({ at: Date.now(), ok: answer.ok === true, status: Number(answer.status) || 0, message: String(answer.message ?? '') })
+      })
+      const discover = () => run('discover', async () => {
+        const answer = await post('/providers/discover', { providerId: provider.id }, 60_000)
+        setFound(Array.isArray(answer.models) ? answer.models : null)
+        // The host persisted the ids and rebuilt the catalog; re-read both views
+        // so the contribution counts and the key fingerprint stay true.
+        onChanged?.()
+      })
+
+      return h('div', { className: 'ofm_rise', style: { display: 'flex', flexDirection: 'column', gap: 10 } },
+        h('div', { className: 'ofm_pickmeta' },
+          h('span', { className: 'ofm_tag' }, AGG_CATEGORY(t)[provider.category] ?? provider.category),
+          h('span', { className: 'ofm_tag' }, provider.format),
+          h('span', { className: 'ofm_tag' }, AGG_AUTH(t)[provider.authKind] ?? provider.authKind),
+          // The card prints this one line above the editor, so it is suppressed
+          // there; the add-provider flow renders the editor alone and keeps it.
+          showContributions === false ? null : h('span', null, t('agg.contributes').replace('{n}', String(contributions)))),
+        h('div', { className: 'ofm_duo' },
+          ToggleRow({
+            label: t('agg.enabled'), checked: enabled, disabled: busy !== '',
+            onChange: () => { if (busy === '') setEnabled(value => !value) },
+          }),
+          field(t('agg.key'),
+            h('input', {
+              className: 'ofm_input', type: 'password', value: key, placeholder: t('agg.keyPlaceholder'),
+              autoComplete: 'off', disabled: busy !== '',
+              onChange: event => setKey(event.target.value),
+            })),
+          field(t('agg.baseUrl'),
+            h('input', {
+              className: 'ofm_input', value: baseUrl, placeholder: provider.baseUrl, disabled: busy !== '',
+              onChange: event => setBaseUrl(event.target.value),
+            })),
+          field(t('agg.models'),
+            h('textarea', {
+              className: 'ofm_input', rows: 2, value: models, placeholder: t('agg.modelsPlaceholder'),
+              disabled: busy !== '',
+              onChange: event => setModels(event.target.value),
+            }))),
+        h('div', { className: 'ofm_row' },
+          h('span', { className: 'ofm_note' }, t('agg.keyKeep')),
+          state?.hasKey === true ? h('span', { className: 'ofm_note' }, t('agg.hasKey').replace('{hint}', state.keyHint)) : h('span', { className: 'ofm_note' }, t('agg.noKey')),
+          state?.hasKey === true ? miniBtn(t('agg.keyClear'), clearKey, { danger: true, disabled: busy !== '', title: t('agg.keyClearWarn') }) : null),
+        h('div', { className: 'ofm_row' },
+          h('span', { className: 'ofm_note' }, t('agg.baseUrlHint')),
+          provider.baseUrl === '' ? null : h('span', { className: 'ofm_note' }, t('agg.baseUrlDefault').replace('{url}', provider.baseUrl)),
+          provider.baseUrlOverrideEnv === '' ? null : h('span', { className: 'ofm_note' }, t('agg.baseUrlEnv').replace('{env}', provider.baseUrlOverrideEnv))),
+        h('p', { className: 'ofm_note' }, t('agg.modelsHint')),
+        h('div', { className: 'ofm_row' },
+          h(Button, { kind: 'primary', disabled: busy !== '', onClick: save }, busy === 'save' ? t('agg.saving') : fresh ? t('agg.add') : t('agg.save')),
+          miniBtn(t('agg.test'), test, { disabled: busy !== '' }),
+          miniBtn(t('agg.discover'), discover, { disabled: busy !== '' }),
+          h('span', { className: 'spacer', style: { marginLeft: 'auto' } }),
+          fresh ? null : (confirm
+            ? h(Fragment, null,
+              miniBtn(t('agg.removeConfirm'), () => run('remove', async () => {
+                const answer = await post('/providers/remove', { providerId: provider.id })
+                onRemoved(answer.aggregate, provider)
+              }), { danger: true, disabled: busy !== '' }),
+              miniBtn(t('agg.cancel'), () => setConfirm(false), { disabled: busy !== '' }))
+            : miniBtn(t('agg.remove'), () => setConfirm(true), { danger: true, disabled: busy !== '' }))),
+        confirm ? h('p', { className: 'ofm_note' }, t('agg.removeWarn')) : null,
+        h('div', { className: 'ofm_row' },
+          verdict === null ? h('span', { className: 'ofm_note' }, t('agg.neverTested'))
+            : h(Fragment, null,
+              h(Pill, { tone: verdict.ok === true ? 'ok' : verdict.status === 0 ? 'warn' : 'err' },
+                verdict.ok === true ? t('agg.testOk') : verdict.status === 0 ? t('agg.testUnverified') : t('agg.testFailed')),
+              h('span', { className: 'ofm_note' }, t('agg.testAt').replace('{when}', ago(verdict.at, t.locale)))),
+          busy === 'test' ? h('span', { className: 'ofm_note' }, t('agg.testing')) : null,
+          busy === 'discover' ? h('span', { className: 'ofm_note' }, t('agg.discovering')) : null),
+        verdict !== null && verdict.ok !== true && verdict.status === 0
+          ? h('p', { className: 'ofm_note' }, t('agg.testUnverifiedWhy')) : null,
+        verdict !== null && verdict.message !== '' ? h('p', { className: 'ofm_note' }, verdict.message) : null,
+        found === null
+          ? null
+          : h('div', { className: 'ofm_row' },
+            h('span', { className: 'ofm_note' }, found.length === 0 ? t('agg.discoveredNone') : t('agg.discovered').replace('{n}', String(found.length))),
+            found.length === 0 ? null : miniBtn(t('agg.discoveredUse'), () => setModels(found.join(', ')))),
+        error === '' ? null : h('div', { className: 'ofm_callout ofm_error' },
+          h('div', null, h('b', null, t('agg.failed')), h('div', null, error))))
+    }
+
+    /** A configured provider as one card: identity, what it contributes, and its
+     *  editor. The editor is inline rather than behind a fold because every field
+     *  on it is something the card's own state can disagree with. */
+    function ProviderCard(props) {
+      const { t, provider, state, contributions, onSaved, onRemoved, onChanged, index } = props
+      return h('div', { className: 'ofm_card ofm_rise', style: { animationDelay: `${Math.min(index, 8) * 22}ms` } },
+        h('div', { className: 'ofm_cardhead' },
+          h('span', { className: 'ofm_cardname', title: provider.name }, provider.name),
+          state.enabled === false ? h('span', { className: 'ofm_tagpill dead' }, t('agg.disabled')) : null),
+        h('div', { className: 'ofm_id' }, provider.id),
+        h('div', { className: 'ofm_metrics' },
+          h('span', null, contributions > 0 ? t('agg.contributes').replace('{n}', String(contributions)) : t('agg.contributesNone')),
+          h('span', null, state.hasKey === true ? t('agg.hasKey').replace('{hint}', state.keyHint) : t('agg.noKey'))),
+        h(ProviderEditor, { t, provider, state, contributions, onSaved, onRemoved, onChanged, showContributions: false }))
+    }
+
+    /**
+     * 聚合渠道: the registry, the configured providers and their editors.
+     *
+     * The catalog is read from the summary the shell already holds, so the
+     * "contributes N models" line is the picker's own view rather than a second
+     * derivation — and every write asks the shell to re-read it, because saving a
+     * provider changes what the model picker offers.
+     */
+    function AggregatePage(props) {
+      const { t, summary } = props
+      const panel = usePanel(() => api('/providers'), [])
+      const [adding, setAdding] = useState(false)
+      const [draft, setDraft] = useState(null)
+      const [query, setQuery] = useState('')
+      const [category, setCategory] = useState('')
+      const catalog = summary?.data?.catalog ?? []
+      const registry = panel.data?.registry ?? []
+      const configured = panel.data?.configured?.providers ?? {}
+      const categories = AGG_CATEGORY(t)
+
+      const afterWrite = (aggregate, provider, isNew) => {
+        if (aggregate !== undefined && aggregate !== null) panel.patch({ configured: aggregate })
+        if (isNew) { setAdding(false); setDraft(null) }
+        summary?.reload?.()
+        showToast({ title: t('agg.saved'), body: t('agg.savedBody').replace('{name}', provider.name), holdMs: 3600 })
+      }
+      const afterRemove = (aggregate, provider) => {
+        if (aggregate !== undefined && aggregate !== null) panel.patch({ configured: aggregate })
+        summary?.reload?.()
+        showToast({ title: t('agg.saved'), body: t('agg.removedBody').replace('{name}', provider.name), holdMs: 3600 })
+      }
+      const afterDiscover = () => { panel.reload(); summary?.reload?.() }
+
+      const needle = query.trim().toLowerCase()
+      const rows = Object.keys(configured)
+        .map(id => ({ id, provider: registry.find(entry => entry.id === id) ?? null, state: configured[id] }))
+        .filter(row => row.provider !== null)
+        .filter(row => category === '' || row.provider.category === category)
+        .filter(row => needle === '' || `${row.id} ${row.provider.name}`.toLowerCase().includes(needle))
+
+      return h('div', { className: 'ofm_page' },
+        h(PageHero, { title: t('agg.title'), sub: t('agg.sub') },
+          h('div', { className: 'ofm_pills' },
+            h(Pill, null, t('agg.registryCount').replace('{n}', String(registry.length))),
+            h(Pill, { strong: true }, t('agg.configuredCount').replace('{n}', String(Object.keys(configured).length)))),
+          h(Button, {
+            kind: adding ? 'ghost' : 'primary',
+            onClick: () => { setAdding(value => !value); setDraft(null) },
+          }, adding ? t('agg.cancel') : t('agg.addProvider'))),
+        panel.status === 'loading' ? h(PanelSkeleton) : null,
+        panel.status === 'error'
+          ? h(PanelError, { t, title: t('agg.loadFailed'), message: panel.error, onRetry: panel.reload })
+          : null,
+        panel.status === 'ready'
+          ? h(Fragment, null,
+            draft !== null
+              ? h('div', { className: 'ofm_panel ofm_rise' },
+                h('div', { className: 'ofm_paneltitle' }, draft.name, h('span', { className: 'ofm_sec_hint' }, draft.id)),
+                h(ProviderEditor, {
+                  t, provider: draft, state: undefined, contributions: 0,
+                  onSaved: afterWrite, onRemoved: afterRemove, onChanged: afterDiscover,
+                }))
+              : adding
+                ? h(ProviderPicker, { t, registry, onPick: setDraft })
+                : null,
+            h(Section, { title: t('agg.configuredTitle'), hint: t('agg.configuredHint') },
+              h('div', { className: 'ofm_row' },
+                h('div', { className: 'ofm_field', style: { flex: '1 1 180px' } },
+                  h('span', null, t('agg.search')),
+                  h('input', { className: 'ofm_input', value: query, placeholder: t('agg.search'), onChange: event => setQuery(event.target.value) })),
+                h('div', { className: 'ofm_field' }, h('span', null, t('agg.filterCategory')),
+                  h('select', { className: 'ofm_input', value: category, onChange: event => setCategory(event.target.value) },
+                    h('option', { value: '' }, t('agg.filterAll')),
+                    Object.keys(categories).map(id => h('option', { key: id, value: id }, categories[id]))))),
+              Object.keys(configured).length === 0
+                ? h('div', { className: 'ofm_panel' },
+                  h('div', { className: 'ofm_paneltitle' }, t('agg.empty')),
+                  h('p', { className: 'ofm_note' }, t('agg.emptyHint')))
+                : rows.length === 0
+                  ? h('p', { className: 'ofm_note' }, t('agg.filterEmpty'))
+                  : h('div', { className: 'ofm_grid' }, rows.map((row, index) => h(ProviderCard, {
+                    key: row.id, t, index, provider: row.provider, state: row.state,
+                    contributions: contributedBy(catalog, row.id),
+                    onSaved: afterWrite, onRemoved: afterRemove, onChanged: afterDiscover,
+                  })))))
+          : null)
+    }
+
+    /** The segmented level picker the two prompt savers share. */
+    function LevelPicker(props) {
+      const { t, levels, value, disabled, onChange } = props
+      const labels = SAVER_LEVEL(t)
+      return h('div', { className: 'ofm_seg', role: 'group' },
+        levels.map(level => h('button', {
+          key: level, type: 'button', disabled, 'aria-pressed': level === value ? 'true' : 'false',
+          onClick: () => { if (!disabled && level !== value) onChange(level) },
+        }, labels[level] ?? level)))
+    }
+
+    /** The savings bar: it grows into place once the first measurement lands, so
+     *  the number reads as a measurement rather than as decoration. */
+    function SavingsMeter(props) {
+      const { t, percent } = props
+      const [live, setLive] = useState(0)
+      useEffect(() => {
+        const timer = setTimeout(() => setLive(Math.max(0, Math.min(100, percent))), 60)
+        return () => clearTimeout(timer)
+      }, [percent])
+      return h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6, minWidth: 0 } },
+        h('div', { className: 'ofm_row' },
+          h('span', { className: 'ofm_note' }, t('saver.percent')),
+          h('b', { className: 'ofm_kpivalue', style: { fontSize: 20 } }, `${percent}%`)),
+        h('div', {
+          className: 'ofm_meter', role: 'progressbar',
+          'aria-valuenow': percent, 'aria-valuemin': 0, 'aria-valuemax': 100, 'aria-label': t('saver.percent'),
+        }, h('i', { style: { width: `${live}%` } })))
+    }
+
+    /**
+     * 省 Token: the three savers and what they have actually saved.
+     *
+     * Every control posts and then renders the host's own answer; nothing here
+     * shows a switch state the settings file does not have. The dashboard reads
+     * the measurement the host keeps, and says so explicitly when there is none —
+     * an empty meter is not a claim that nothing was saved, it is the absence of a
+     * measurement.
+     */
+    function SaverPage(props) {
+      const { t } = props
+      const panel = usePanel(() => Promise.all([api('/token-saver'), api('/local-optimize')])
+        .then(([saver, local]) => ({ saver, local })), [])
+      const [busy, setBusy] = useState('')
+      const [error, setError] = useState('')
+      const saver = panel.data?.saver
+      const local = panel.data?.local
+      const savings = saver?.savings ?? null
+
+      const write = async (kind, action) => {
+        setBusy(kind)
+        setError('')
+        try { await action() } catch (failure) {
+          // The route refuses an unknown level with a 400 and a sentence naming
+          // the legal ones; showing it is more useful than swallowing it.
+          setError(String(failure?.message ?? failure))
+          showToast({ title: t('saver.failed'), body: String(failure?.message ?? failure), tone: 'warn', holdMs: 6000 })
+        } finally { setBusy('') }
+      }
+      const saveSaver = patch => write('saver', async () => {
+        const answer = await post('/token-saver', patch)
+        // The POST answer carries the stored switches; the measurement is the
+        // host's own tally and is only served by the GET, so it is kept as-is.
+        panel.patch(current => ({ ...current, saver: { ...answer.tokenSaver, savings: current.saver?.savings } }))
+        showToast({ title: t('saver.saved'), body: t('saver.savedBody'), holdMs: 3200 })
+      })
+      const saveLocal = patch => write('local', async () => {
+        const answer = await post('/local-optimize', patch)
+        panel.patch(current => ({ ...current, local: answer.localOptimize }))
+        showToast({ title: t('saver.saved'), body: t('saver.savedBody'), holdMs: 3200 })
+      })
+
+      return h('div', { className: 'ofm_page' },
+        h(PageHero, { title: t('saver.title'), sub: t('saver.sub') },
+          h('div', { className: 'ofm_pills' },
+            h(Pill, { strong: true, tone: saver?.enabled === false ? 'warn' : 'ok' },
+              saver?.enabled === false ? t('agg.disabled') : t('agg.enabled')))),
+        panel.status === 'loading' ? h(PanelSkeleton) : null,
+        panel.status === 'error'
+          ? h(PanelError, { t, title: t('saver.loadFailed'), message: panel.error, onRetry: panel.reload })
+          : null,
+        error === '' ? null : h('div', { className: 'ofm_callout ofm_error ofm_rise' }, h('div', null, error)),
+        panel.status === 'ready'
+          ? h(Fragment, null,
+            // The master switch governs all three savers, so it stands on its own
+            // above them: inside the prompt-shaping section it read as that
+            // section's switch, which is the one thing it is not.
+            h('div', { className: 'ofm_panel ofm_rise' },
+              h('div', { className: 'ofm_row' },
+                h(Switch, {
+                  checked: saver.enabled !== false, label: t('saver.master'), disabled: busy !== '',
+                  onChange: () => { if (busy === '') saveSaver({ enabled: saver.enabled === false }) },
+                }),
+                h('span', { className: 'ofm_note' }, t('saver.masterHint')))),
+            h(Section, { title: t('saver.dashTitle'), hint: t('saver.dashHint') },
+              savings === null
+                ? h('p', { className: 'ofm_note' }, t('saver.noData'))
+                : h('div', { className: 'ofm_panel ofm_rise' },
+                  h('div', { className: 'ofm_stats' },
+                    stat(`${fmtInt(savings.bytesBefore)} B`, t('saver.bytesBefore')),
+                    stat(`${fmtInt(savings.bytesAfter)} B`, t('saver.bytesAfter')),
+                    stat(`${fmtInt(savings.saved)} B`, t('saver.bytesSaved')),
+                    stat(String(savings.blocks), t('saver.blocks')),
+                    stat(String(savings.calls), t('saver.calls')),
+                    stat(String(savings.promptCalls), t('saver.promptCalls'))),
+                  savings.bytesBefore > 0
+                    ? h(SavingsMeter, { t, percent: savings.percent })
+                    : h('p', { className: 'ofm_note' }, t('saver.noData')),
+                  savings.summary === undefined || savings.summary === ''
+                    ? null
+                    : h('p', { className: 'ofm_note' }, `${t('saver.report')} · ${savings.summary}`))),
+            h(Section, { title: t('saver.promptTitle'), hint: t('saver.promptHint') },
+              h('div', { className: 'ofm_panel ofm_rise' },
+                h('div', { className: 'ofm_duo' },
+                  h('div', { className: 'ofm_field' },
+                    h('span', null, t('saver.caveman')),
+                    h(LevelPicker, {
+                      t, levels: saver.cavemanLevels ?? [], value: saver.prompts?.caveman, disabled: busy !== '',
+                      onChange: level => saveSaver({ prompts: { caveman: level } }),
+                    }),
+                    h('span', null, t('saver.cavemanWhat'))),
+                  h('div', { className: 'ofm_field' },
+                    h('span', null, t('saver.ponytail')),
+                    h(LevelPicker, {
+                      t, levels: saver.ponytailLevels ?? [], value: saver.prompts?.ponytail, disabled: busy !== '',
+                      onChange: level => saveSaver({ prompts: { ponytail: level } }),
+                    }),
+                    h('span', null, t('saver.ponytailWhat')))),
+                h('p', { className: 'ofm_note' }, t('saver.voiceWarn')))),
+            h(Section, { title: t('saver.rtk'), hint: t('saver.rtkWhat') },
+              h('div', { className: 'ofm_panel ofm_rise' },
+                h('div', { className: 'ofm_row' },
+                  h(Switch, {
+                    checked: saver.rtk === true, label: t('saver.rtk'), disabled: busy !== '',
+                    onChange: () => { if (busy === '') saveSaver({ rtk: saver.rtk !== true }) },
+                  })),
+                h('p', { className: 'ofm_note' }, t('saver.rtkSafety')))),
+            h(Section, { title: t('saver.localTitle'), hint: t('saver.localHint') },
+              h('div', { className: 'ofm_panel ofm_rise' },
+                h('div', { className: 'ofm_row' },
+                  h(Switch, {
+                    checked: local.enabled !== false, label: t('saver.local.enabled'), disabled: busy !== '',
+                    onChange: () => { if (busy === '') saveLocal({ enabled: local.enabled === false }) },
+                  })),
+                h('div', { className: 'ofm_duo' },
+                  h('div', { className: 'ofm_field' },
+                    h(Switch, {
+                      checked: local.quota !== false, label: t('saver.local.quota'), disabled: busy !== '',
+                      onChange: () => { if (busy === '') saveLocal({ quota: local.quota === false }) },
+                    }),
+                    h('span', null, t('saver.local.quotaHint'))),
+                  h('div', { className: 'ofm_field' },
+                    h(Switch, {
+                      checked: local.prefix !== false, label: t('saver.local.prefix'), disabled: busy !== '',
+                      onChange: () => { if (busy === '') saveLocal({ prefix: local.prefix === false }) },
+                    }),
+                    h('span', null, t('saver.local.prefixHint'))),
+                  h('div', { className: 'ofm_field' },
+                    h(Switch, {
+                      checked: local.title !== false, label: t('saver.local.title'), disabled: busy !== '',
+                      onChange: () => { if (busy === '') saveLocal({ title: local.title === false }) },
+                    }),
+                    h('span', null, t('saver.local.titleHint'))),
+                  h('div', { className: 'ofm_field' },
+                    h(Switch, {
+                      checked: local.suggestion !== false, label: t('saver.local.suggestion'), disabled: busy !== '',
+                      onChange: () => { if (busy === '') saveLocal({ suggestion: local.suggestion === false }) },
+                    }),
+                    h('span', null, t('saver.local.suggestionHint'))),
+                  h('div', { className: 'ofm_field' },
+                    h(Switch, {
+                      checked: local.filepath !== false, label: t('saver.local.filepath'), disabled: busy !== '',
+                      onChange: () => { if (busy === '') saveLocal({ filepath: local.filepath === false }) },
+                    }),
+                    h('span', null, t('saver.local.filepathHint')))))))
+          : null)
+    }
+
+    /** The chain editor's member picker: searchable, and it shows the lane and
+     *  the vision flag, because those are what decide a chain's order. */
+    function ModelPicker(props) {
+      const { t, models, chosen, onPick } = props
+      const [query, setQuery] = useState('')
+      const lanes = LANE_LABEL(t)
+      const needle = query.trim().toLowerCase()
+      const rows = models
+        .filter(row => needle === '' || `${row.id} ${row.name}`.toLowerCase().includes(needle))
+        .slice(0, 60)
+      return h('div', { className: 'ofm_panel' },
+        h('div', { className: 'ofm_paneltitle' }, t('routing.pickModel')),
+        h('div', { className: 'ofm_row' },
+          h('div', { className: 'ofm_field', style: { flex: '1 1 200px' } },
+            h('span', null, t('routing.pickModel')),
+            h('input', { className: 'ofm_input', value: query, placeholder: t('routing.searchModel'), onChange: event => setQuery(event.target.value) }))),
+        rows.length === 0
+          ? h('p', { className: 'ofm_note' }, t('routing.noModel'))
+          : h('div', { className: 'ofm_picklist' }, rows.map(row => h('button', {
+            key: row.id, type: 'button', className: 'ofm_pickrow',
+            'aria-pressed': chosen.includes(row.id) ? 'true' : 'false',
+            onClick: () => onPick(row.id),
+          },
+          h('span', { className: 'ofm_pickhead' }, h('b', { title: row.name }, row.name ?? row.id)),
+          h('span', { className: 'ofm_pickmeta' },
+            h('span', { className: 'ofm_id' }, row.id),
+            h('span', { className: 'ofm_tag' }, lanes[row.channel] ?? row.channel),
+            row.vision === true ? h('span', { className: 'ofm_tag' }, t('tag.vision')) : null)))))
+    }
+
+    /**
+     * The chain editor.
+     *
+     * The member list is ordered and the order is the chain, so it is edited in
+     * place (add / remove / move) rather than through a free-text field: a typo in
+     * a text field is a link that silently never resolves, and the host has no way
+     * to tell "you meant this model" from "this model is gone".
+     */
+    function ChainEditor(props) {
+      const { t, chain, models, onSave, onCancel } = props
+      const [name, setName] = useState(chain.name ?? '')
+      const [strategy, setStrategy] = useState(chain.strategy === 'round-robin' ? 'round-robin' : 'fallback')
+      const [stickyLimit, setStickyLimit] = useState(String(chain.stickyLimit ?? 1))
+      const [enabled, setEnabled] = useState(chain.enabled !== false)
+      const [members, setMembers] = useState(Array.isArray(chain.models) ? chain.models : [])
+      const [picking, setPicking] = useState(false)
+      const [busy, setBusy] = useState(false)
+      const [error, setError] = useState('')
+      const byId = new Map(models.map(row => [row.id, row]))
+      const lanes = LANE_LABEL(t)
+
+      const move = (index, delta) => setMembers(current => {
+        const next = [...current]
+        const target = index + delta
+        if (target < 0 || target >= next.length) return current
+        const [row] = next.splice(index, 1)
+        next.splice(target, 0, row)
+        return next
+      })
+      const submit = async () => {
+        setBusy(true)
+        setError('')
+        try {
+          const limit = Number(stickyLimit)
+          await onSave({
+            ...chain.id === undefined ? {} : { id: chain.id },
+            name,
+            models: members,
+            strategy,
+            stickyLimit: Number.isFinite(limit) && limit > 0 ? Math.floor(limit) : 1,
+            enabled,
+          })
+        } catch (failure) { setError(String(failure?.message ?? failure)) } finally { setBusy(false) }
+      }
+
+      return h('div', { className: 'ofm_panel ofm_rise' },
+        h('div', { className: 'ofm_row' },
+          h('div', { className: 'ofm_field', style: { flex: '1 1 180px' } },
+            h('span', null, t('routing.name')),
+            h('input', {
+              className: 'ofm_input', value: name, placeholder: t('routing.namePlaceholder'), disabled: busy,
+              onChange: event => setName(event.target.value),
+            })),
+          h('div', { className: 'ofm_field' },
+            h('span', null, t('routing.strategy')),
+            h('div', { className: 'ofm_seg', role: 'group' },
+              h('button', {
+                type: 'button', disabled: busy, 'aria-pressed': strategy === 'fallback' ? 'true' : 'false',
+                onClick: () => { if (!busy) setStrategy('fallback') },
+              }, t('routing.strategy.fallback')),
+              h('button', {
+                type: 'button', disabled: busy, 'aria-pressed': strategy === 'round-robin' ? 'true' : 'false',
+                onClick: () => { if (!busy) setStrategy('round-robin') },
+              }, t('routing.strategy.roundRobin')))),
+          strategy === 'round-robin'
+            ? h('div', { className: 'ofm_field' },
+              h('span', null, t('routing.stickyLimit')),
+              h('input', {
+                className: 'ofm_input', type: 'number', min: 1, max: 100, style: { width: 96 },
+                value: stickyLimit, disabled: busy,
+                onChange: event => setStickyLimit(event.target.value),
+              }))
+            : null,
+          h(Switch, {
+            checked: enabled, label: t('routing.enabled'), disabled: busy,
+            onChange: () => { if (!busy) setEnabled(value => !value) },
+          })),
+        strategy === 'round-robin' ? h('p', { className: 'ofm_note' }, t('routing.stickyHint')) : null,
+        h('div', { className: 'ofm_paneltitle' }, t('routing.members'),
+          h('span', { className: 'ofm_sec_hint' }, t('routing.memberCount').replace('{n}', String(members.length)))),
+        members.length === 0
+          ? h('p', { className: 'ofm_note' }, t('routing.memberEmpty'))
+          : h('div', { style: { display: 'flex', flexDirection: 'column', gap: 6 } }, members.map((id, index) => {
+            const row = byId.get(id)
+            return h('div', { key: `${id}#${index}`, className: 'ofm_member' },
+              h('span', { className: 'ofm_id', title: id }, row?.name ?? id),
+              h('span', { className: 'ofm_tag' }, lanes[row?.channel] ?? ''),
+              miniBtn('↑', () => move(index, -1), { disabled: busy || index === 0, title: t('routing.moveUp') }),
+              miniBtn('↓', () => move(index, 1), { disabled: busy || index === members.length - 1, title: t('routing.moveDown') }),
+              miniBtn(t('routing.removeMember'), () => setMembers(current => current.filter((_, at) => at !== index)), { danger: true, disabled: busy }))
+          })),
+        h('div', { className: 'ofm_row' },
+          h(Button, { kind: 'ghost', disabled: busy, onClick: () => setPicking(value => !value) }, picking ? t('routing.cancel') : t('routing.addMember'))),
+        picking ? h(ModelPicker, { t, models, chosen: members, onPick: id => setMembers(current => [...current, id]) }) : null,
+        h('div', { className: 'ofm_row' },
+          h(Button, { kind: 'primary', disabled: busy || name.trim() === '' || members.length === 0, onClick: submit }, t('routing.save')),
+          h(Button, { kind: 'ghost', disabled: busy, onClick: onCancel }, t('routing.cancel'))),
+        error === '' ? null : h('div', { className: 'ofm_callout ofm_error' },
+          h('div', null, h('b', null, t('routing.failed')), h('div', null, error))))
+    }
+
+    /**
+     * One stored chain.
+     *
+     * A chain that resolves to nothing right now is *not* an error state: the host
+     * keeps such a chain on purpose, because a link that reaches an EAC model is
+     * still correct on a day that lane is closed, and rewriting the user's chain
+     * for them is worse than showing it as unavailable. So the card names the
+     * members that are not in the roster and says the chain is kept as written —
+     * which is the difference between "your chain is fine" and "your chain is
+     * broken", and the user is the only one who can tell which one it is.
+     */
+    function ChainCard(props) {
+      const { t, chain, resolved, missing, lookup, onEdit, onDelete, confirming, index } = props
+      const lanes = LANE_LABEL(t)
+      const usable = chain.enabled !== false && resolved.length > 0
+      return h('div', { className: 'ofm_card ofm_rise', style: { animationDelay: `${Math.min(index, 8) * 22}ms` } },
+        h('div', { className: 'ofm_cardhead' },
+          h('span', { className: 'ofm_cardname', title: chain.name }, chain.name),
+          h(Pill, { tone: usable ? 'ok' : 'warn' }, usable ? t('routing.usable') : t('routing.notUsable'))),
+        h('div', { className: 'ofm_metrics' },
+          h('span', null, chain.id),
+          h('span', null, chain.strategy === 'round-robin' ? t('routing.strategy.roundRobin') : t('routing.strategy.fallback')),
+          h('span', null, t('routing.memberCount').replace('{n}', String((chain.models ?? []).length)))),
+        h('div', { className: 'ofm_row' },
+          h('span', { className: 'ofm_note' }, t('routing.resolved')),
+          resolved.length === 0
+            ? h('span', { className: 'ofm_note' }, '—')
+            : resolved.map(id => h('span', { key: id, className: 'ofm_tag' }, `${lookup.get(id)?.name ?? id} · ${lanes[lookup.get(id)?.channel] ?? ''}`))),
+        missing.length === 0
+          ? null
+          : h(Fragment, null,
+            h('p', { className: 'ofm_note' }, t('routing.missing').replace('{ids}', missing.join(', '))),
+            h('p', { className: 'ofm_note' }, t('routing.notUsableWhy'))),
+        h('div', { className: 'ofm_row' },
+          miniBtn(t('routing.edit'), onEdit),
+          onDelete === undefined ? null : miniBtn(confirming === true ? t('routing.deleteConfirm') : t('routing.delete'), onDelete, { danger: true })))
+    }
+
+    /**
+     * 路由: the stored fallback chains and their editor.
+     *
+     * The resolution shown per chain is derived from the model list this page
+     * already holds — the same intersection the host uses to build the virtual
+     * catalog row — so it survives a reload, and the `usable` array a save answers
+     * with is preferred when it is there.
+     */
+    function RoutingPage(props) {
+      const { t } = props
+      const panel = usePanel(() => api('/combos'), [])
+      const [editing, setEditing] = useState(null)
+      const [confirm, setConfirm] = useState('')
+      const chains = panel.data?.combos ?? []
+      const models = panel.data?.models ?? []
+      const lookup = useMemo(() => new Map(models.map(row => [row.id, row])), [models])
+
+      const resolvedOf = chain => {
+        const answered = (panel.data?.usable ?? []).find(row => row.id === chain.id)
+        if (answered !== undefined) return answered.models
+        return (chain.models ?? []).filter(id => lookup.has(id))
+      }
+      const missingOf = chain => (chain.models ?? []).filter(id => !lookup.has(id))
+      const save = async row => {
+        // The whole list is written back, because that is the route's shape: it
+        // normalizes and replaces. An edit keeps its id, so a rename never changes
+        // the model id a client may already be pinned to.
+        const known = chains.some(chain => chain.id === row.id)
+        const rows = known ? chains.map(chain => chain.id === row.id ? row : chain) : [...chains, row]
+        const answer = await post('/combos', { combos: rows })
+        panel.patch({ combos: answer.combos, usable: answer.usable })
+        panel.reload()
+        setEditing(null)
+        showToast({ title: t('routing.saved'), body: t('routing.savedBody'), holdMs: 3200 })
+      }
+      const remove = async id => {
+        const answer = await post('/combos', { combos: chains.filter(chain => chain.id !== id) })
+        panel.patch({ combos: answer.combos, usable: answer.usable })
+        panel.reload()
+        setConfirm('')
+        showToast({ title: t('routing.saved'), body: t('routing.savedBody'), holdMs: 3200 })
+      }
+      // A fresh chain is the same editor with an empty draft: the fields, the
+      // member list and the validation are identical, only the id is absent.
+      const blank = { name: '', models: [], strategy: 'fallback', stickyLimit: 1, enabled: true }
+
+      return h('div', { className: 'ofm_page' },
+        h(PageHero, { title: t('routing.title'), sub: t('routing.sub') },
+          h('div', { className: 'ofm_pills' },
+            h(Pill, null, t('routing.chains') + ' ' + String(chains.length)))),
+        panel.status === 'loading' ? h(PanelSkeleton) : null,
+        panel.status === 'error'
+          ? h(PanelError, { t, title: t('routing.loadFailed'), message: panel.error, onRetry: panel.reload })
+          : null,
+        panel.status === 'ready'
+          ? h(Section, { title: t('routing.chains'), hint: t('routing.chainsHint') },
+            // The editor renders full width above the list rather than inside a
+            // grid cell: a chain's member list and its picker need the room, and a
+            // form squeezed into a 252 px column is a form nobody can order.
+            editing !== null
+              ? h(ChainEditor, {
+                t, models, chain: editing.chain,
+                onSave: save, onCancel: () => setEditing(null),
+              })
+              : chains.length === 0
+                ? h('div', { className: 'ofm_panel' },
+                  h('div', { className: 'ofm_paneltitle' }, t('routing.empty')),
+                  h('p', { className: 'ofm_note' }, t('routing.emptyHint')),
+                  h('div', { className: 'ofm_row' },
+                    h(Button, { kind: 'primary', onClick: () => setEditing({ chain: blank }) }, t('routing.newChain'))))
+                : h('div', { className: 'ofm_row' },
+                  h(Button, { kind: 'primary', onClick: () => setEditing({ chain: blank }) }, t('routing.newChain'))),
+            chains.length === 0 ? null : h('div', { className: 'ofm_grid' }, chains.map((chain, index) => h(ChainCard, {
+              key: chain.id, t, index, chain, lookup,
+              resolved: resolvedOf(chain), missing: missingOf(chain),
+              confirming: confirm === chain.id,
+              onEdit: () => setEditing({ chain }),
+              onDelete: () => { if (confirm === chain.id) void remove(chain.id); else setConfirm(chain.id) },
+            }))),
+            confirm === '' ? null : h('p', { className: 'ofm_note' }, t('routing.deleteWarn')))
+          : null)
     }
 
     // ── settings page ─────────────────────────────────────────────────────────
@@ -3906,7 +5633,7 @@ window.__ModuleLoader__.load({
     // The active page lives in localStorage so a reload — or the hot reload the
     // upgrader triggers — comes back to the page the user was reading.
     const TAB_KEY = 'ofm.tab'
-    const TABS = ['free', 'eac', 'channels']
+    const TABS = ['free', 'eac', 'channels', 'aggregate', 'saver', 'routing', 'ledger', 'logs', 'gateway']
 
     function Shell(props) {
       const { t, data, counts, summary, stats, eacAuth, setEacAuth, eacLogin, busy, setBusy, apply, bench, benches, ctx } = props
@@ -3940,6 +5667,9 @@ window.__ModuleLoader__.load({
         ['free', t('nav.tab.free'), counts.available ?? 0],
         ['eac', t('nav.tab.eac'), data.catalog.filter(m => m.channel === 'eac').length],
         ['channels', t('nav.tab.channels'), CHANNEL_PROVIDERS.length],
+        ['aggregate', t('nav.tab.aggregate'), data.catalog.filter(m => m.channel === 'aggregate').length],
+        ['saver', t('nav.tab.saver'), null],
+        ['routing', t('nav.tab.routing'), data.catalog.filter(m => m.channel === 'combo').length],
         ['ledger', t('nav.tab.ledger'), null],
         ['logs', t('nav.tab.logs'), null],
         ['gateway', t('nav.tab.gateway'), null],
@@ -3962,15 +5692,21 @@ window.__ModuleLoader__.load({
 
       const page = tab === 'channels'
         ? h(ChannelsPage, { t, ctx, summary })
-        : tab === 'ledger'
-          ? h(LedgerPage, { t, ctx })
-          : tab === 'logs'
-            ? h(LogsPage, { t, ctx })
-            : tab === 'gateway'
-              ? h(GatewayPage, { t, ctx })
-              : tab === 'eac'
-                ? h(EacPage, { t, data, counts, summary, stats, eacAuth, setEacAuth, eacLogin, busy, apply, bench, benches, refresh, reprobe })
-                : h(FreePage, { t, data, counts, summary, stats, eacAuth, eacLogin, busy, apply, bench, benches, refresh, reprobe })
+        : tab === 'aggregate'
+          ? h(AggregatePage, { t, summary })
+          : tab === 'saver'
+            ? h(SaverPage, { t })
+            : tab === 'routing'
+              ? h(RoutingPage, { t })
+              : tab === 'ledger'
+                ? h(LedgerPage, { t, ctx })
+                : tab === 'logs'
+                  ? h(LogsPage, { t, ctx })
+                  : tab === 'gateway'
+                    ? h(GatewayPage, { t, ctx })
+                    : tab === 'eac'
+                      ? h(EacPage, { t, data, counts, summary, stats, eacAuth, setEacAuth, eacLogin, busy, apply, bench, benches, refresh, reprobe })
+                      : h(FreePage, { t, data, counts, summary, stats, eacAuth, eacLogin, busy, apply, bench, benches, refresh, reprobe })
 
       return h('div', { className: 'ofm_root ofm_shell' },
         h('div', { className: 'ofm_aurora', 'aria-hidden': 'true' }, h('i'), h('i'), h('i')),
