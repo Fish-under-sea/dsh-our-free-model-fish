@@ -77,16 +77,21 @@ What this fork adds over upstream, as of `2.2.0`:
   (they stay in `$DSH_HOME/our-free-model/`).
 - The upstream `package.json`'s `private` flag is dropped, which is what makes npm installation possible.
 
-Upstream's release signing key is not on this machine, so this fork **does not publish a self-upgrade
-manifest** (`feed/manifest.json` and `catalog/integrity.json` keep upstream's signature and are not
-refreshed here). Two consequences:
+Upstream's release signing key is not on this machine, so this fork **cannot sign a self-upgrade manifest
+of its own** (`feed/manifest.json` and `catalog/integrity.json` keep upstream's signature and are not
+refreshed here). That creates one risk you must know about:
 
-- The in-app "check for updates" still reads upstream `2.1.0`, which is below this fork's `2.2.0`, so it
-  **offers nothing** — and cannot downgrade you.
-- Once upstream ships a version above this fork's (say `2.3.0`), the in-app upgrade would **overwrite
-  this fork's directory with the upstream package** — the package name reverts to `dsh-our-free-model`,
-  no longer matches `dsh-our-free-model-fish` in `dsh.profile.bundles`, and startup fails with a missing
-  bundle. **Upgrade this fork through npm only; do not press the in-app upgrade button.**
+- The in-app "check for updates" reads the **upstream** repository's manifest. Measured: that manifest
+  **verifies against the release key pinned inside this plugin** (upstream and this fork share one trust
+  root), and upstream's version (`2.5.1` at the time of writing) is above this fork's `2.2.0`, so the
+  settings page **does offer an update**.
+- Pressing "upgrade now" writes **upstream's 74 files** into this plugin's install directory and deletes
+  the files unique to this fork (`src/channel-visibility.js`, `src/image-pricing.js`); `package.json`
+  becomes upstream's `"name": "dsh-our-free-model"` with `"private": true`, no longer matches
+  `dsh-our-free-model-fish` in `dsh.profile.bundles`, and **startup fails with a missing bundle**.
+- **Upgrade this fork through npm only (`npm i dsh-our-free-model-fish@latest`); do not press the in-app
+  upgrade button.** To roll back, `$DSH_HOME/our-free-model/rollback/` holds a complete copy taken
+  before the upgrade — copy it back over the plugin directory.
 
 Please file upstream's issues, PRs, discussions and stars with the
 [upstream repository](https://github.com/Ebony-Vinyl/dsh-our-free-model); only problems this fork

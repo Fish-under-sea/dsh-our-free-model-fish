@@ -78,13 +78,18 @@
   因此**从上游切换过来不会丢失设置**（数据仍在 `$DSH_HOME/our-free-model/`）。
 - 去掉了上游 `package.json` 的 `private` 标记，使 npm 安装可用。
 
-上游的发布私钥不在本机，所以本仓库**不发布自升级清单**（`feed/manifest.json`、`catalog/integrity.json`
-沿用上游签名，不随本改版刷新）。这意味着两件事：
+上游的发布私钥不在本机，所以本仓库**无法签发自己的自升级清单**（`feed/manifest.json`、
+`catalog/integrity.json` 沿用上游签名，不随本改版刷新）。由此产生一个必须知道的风险：
 
-- 应用内「检查更新」看到的仍是上游 `2.1.0`，低于本改版的 `2.2.0`，因此**不会提示更新**，也不会降级。
-- 一旦上游发布高于本改版的版本（例如 `2.3.0`），应用内升级会**把上游包覆盖到本改版的目录里**——
-  包名变回 `dsh-our-free-model`，与 `dsh.profile.bundles` 里写的 `dsh-our-free-model-fish` 失配，
-  启动即报找不到 bundle。**本改版的升级请一律走 npm，不要点应用内的升级按钮。**
+- 应用内「检查更新」读的是**上游仓库**的清单。实测该清单**能通过本插件内置公钥的验签**
+  （上游与本改版共用同一个信任根），且上游版本（写作时为 `2.5.1`）高于本改版的 `2.2.0`，
+  因此设置页会**提示有更新**。
+- 一旦按下「立即升级」，升级器会把**上游的 74 个文件**写进本插件的安装目录，并删掉本改版独有的
+  文件（如 `src/channel-visibility.js`、`src/image-pricing.js`）；`package.json` 会被换成上游的
+  `"name": "dsh-our-free-model"` 与 `"private": true`，与 `dsh.profile.bundles` 里写的
+  `dsh-our-free-model-fish` 失配，**启动即报找不到 bundle**。
+- **结论：本改版的升级请一律走 npm（`npm i dsh-our-free-model-fish@latest`），不要点应用内的升级按钮。**
+  回滚办法：`$DSH_HOME/our-free-model/rollback/` 里保留了升级前的完整副本，覆盖回插件目录即可。
 
 上游的 issue、PR、讨论与 Star 都请提交到[上游仓库](https://github.com/Ebony-Vinyl/dsh-our-free-model)；
 只有本改版自身引入的问题才提到本仓库。
