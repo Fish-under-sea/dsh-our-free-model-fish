@@ -48,7 +48,7 @@ const record = globalThis.__registered
 if (record === undefined) {
   problems.push('the bundle never registered itself with the module loader')
 } else {
-  if (record.id !== 'dsh-our-free-model') problems.push(`registered id "${record.id}" must equal the package name`)
+  if (record.id !== 'dsh-our-free-model-fish') problems.push(`registered id "${record.id}" must equal the package name`)
   if (typeof record.factory !== 'function') problems.push('factory is not a function')
   else {
     const exports = record.factory(name => {

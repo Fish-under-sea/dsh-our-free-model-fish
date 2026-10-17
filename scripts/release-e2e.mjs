@@ -167,7 +167,7 @@ await check('a CRLF working tree describes the same release', () => {
 })
 
 await check('an older installed copy is offered this release', async () => {
-  const pkgDir = installedPackage(path.join(scratch, 'a', 'node_modules', 'dsh-our-free-model'))
+  const pkgDir = installedPackage(path.join(scratch, 'a', 'node_modules', 'dsh-our-free-model-fish'))
   const status = await updaterFor(pkgDir, path.join(scratch, 'a', 'dsh-home')).check()
   assert(status.available === true, `not offered: ${JSON.stringify(status)}`)
   assert(status.latest === manifest.version, `latest ${status.latest} != ${manifest.version}`)
@@ -175,7 +175,7 @@ await check('an older installed copy is offered this release', async () => {
 })
 
 await check('applying it installs every real file and the digests match', async () => {
-  const pkgDir = installedPackage(path.join(scratch, 'b', 'node_modules', 'dsh-our-free-model'))
+  const pkgDir = installedPackage(path.join(scratch, 'b', 'node_modules', 'dsh-our-free-model-fish'))
   const dataDir = path.join(scratch, 'b', 'dsh-home')
   await updaterFor(pkgDir, dataDir).apply({ version: manifest.version })
   const installed = JSON.parse(fs.readFileSync(path.join(pkgDir, 'package.json'), 'utf8'))
@@ -198,7 +198,7 @@ await check('NEGATIVE CONTROL: a manifest that lies about one byte is refused', 
   const bad = JSON.parse(manifestRaw.toString('utf8'))
   bad.version = '9.9.9'
   bad.files[0] = { ...bad.files[0], size: bad.files[0].size + 1 }
-  const pkgDir = installedPackage(path.join(scratch, 'c', 'node_modules', 'dsh-our-free-model'))
+  const pkgDir = installedPackage(path.join(scratch, 'c', 'node_modules', 'dsh-our-free-model-fish'))
   const dataDir = path.join(scratch, 'c', 'dsh-home')
   tampered = Buffer.from(JSON.stringify(bad))
   let error

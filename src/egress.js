@@ -640,7 +640,7 @@ function sameSecret(given, expected) {
  */
 export function renderMihomoConfig({ subscription, mixedPort, apiPort, secret, auth, logFile }) {
   return [
-    '# Managed by dsh-our-free-model. Edits are overwritten on the next sync.',
+    '# Managed by dsh-our-free-model-fish. Edits are overwritten on the next sync.',
     `mixed-port: ${mixedPort}`,
     // The outlet serves this plugin alone: a private loopback listener with no
     // LAN exposure, no system proxy and no TUN — only `egressFetch` reroutes.
