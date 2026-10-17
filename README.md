@@ -1,11 +1,12 @@
 <div align="center">
   <img src="icon.svg" alt="Our Free Model — DeepSeek Harness 免费模型插件" width="120">
 
-# dsh-our-free-model
+# dsh-our-free-model-fish
 
 **简体中文** | [English](README_EN.md)
 
   <img alt="许可证" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
+  <a href="https://github.com/Ebony-Vinyl/dsh-our-free-model"><img alt="上游项目：Ebony-Vinyl/dsh-our-free-model 的社区改版" src="https://img.shields.io/badge/fork%20of-Ebony--Vinyl%2Fdsh--our--free--model-6b4b9e?style=flat-square"></a>
   <img alt="零依赖" src="https://img.shields.io/badge/dependencies-zero-4b6fff?style=flat-square">
   <img alt="无构建步骤" src="https://img.shields.io/badge/build%20step-none-7da1de?style=flat-square">
   <img alt="适配内核" src="https://img.shields.io/badge/dsh-0.1.5--0.1.7--rc.2-2f6f4f?style=flat-square">
@@ -15,6 +16,12 @@
   <a href="https://trendshift.io/repositories/261203"><img alt="GITHUB TRENDING 第 2 名，周榜仓库" src="docs/images/trendshift-weekly-laurel-purple.svg" width="250" height="55"></a>
 
 </div>
+
+> **这是上游项目的社区改版，不是原创项目。** 本仓库 fork 自
+> [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model)：代码、界面、
+> 文档与发布流程的绝大部分由上游作者 Ebony-Vinyl 及其贡献者完成，本仓库只在其基础上做增量修改，
+> 并以 `dsh-our-free-model-fish` 的包名发布到 npm，以免占用上游的包名。上方徽章与榜单成绩、
+> 文末 Star 曲线均属于**上游仓库**。逐项差异见[这是什么](#这是什么)。
 
 <div align="center">
 
@@ -43,6 +50,44 @@
   <br>
   扫码加入群聊，一起交流插件使用心得、反馈问题与分享玩法。
 </div>
+
+---
+
+## 这是什么
+
+**本仓库是上游 [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) 的
+社区改版（fork），不是原创项目。** 上游作者是 Ebony-Vinyl，插件的能力、界面与绝大部分代码都由
+上游与其贡献者完成；这里做的是在其基础上叠加若干改动，再用一个**自己的 npm 包名**
+`dsh-our-free-model-fish` 发布，以免占用上游的 `dsh-our-free-model`。
+
+| | 上游 `dsh-our-free-model` | 本改版 `dsh-our-free-model-fish` |
+| --- | --- | --- |
+| 仓库 | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | [Fish-under-sea/dsh-our-free-model-fish](https://github.com/Fish-under-sea/dsh-our-free-model-fish) |
+| npm 包名 | `dsh-our-free-model` | `dsh-our-free-model-fish` |
+| 维护者 | Ebony-Vinyl 及上游贡献者 | Fish-under-sea（仅维护本改版） |
+| 榜单 / Star 数 | 属于上游仓库 | 与本仓库无关，不应据此评价本改版 |
+
+本改版相对上游的增量（截至 `2.2.0`）：
+
+- **免费通道按面积计价**（`src/image-pricing.js`）——缺少厂商视觉计价协议时，按图片真实像素估算
+  视觉 token，替代上游固定 1024 的兜底估算；已移出请求的图片只计描述文本。
+- **渠道目录可见性总开关**（`src/channel-visibility.js`）——渠道包 13 个 provider 的分组可一次性收起，
+  不必逐个模型关闭，也不受远端新增模型影响。
+- **公告改挂 `body` 并补齐键盘可达**——公告正文渲染与焦点顺序按无障碍要求调整。
+- **包名与发布身份独立**——`dsh-our-free-model-fish`，行 id 与数据目录名仍为 `our-free-model`，
+  因此**从上游切换过来不会丢失设置**（数据仍在 `$DSH_HOME/our-free-model/`）。
+- 去掉了上游 `package.json` 的 `private` 标记，使 npm 安装可用。
+
+上游的发布私钥不在本机，所以本仓库**不发布自升级清单**（`feed/manifest.json`、`catalog/integrity.json`
+沿用上游签名，不随本改版刷新）。这意味着两件事：
+
+- 应用内「检查更新」看到的仍是上游 `2.1.0`，低于本改版的 `2.2.0`，因此**不会提示更新**，也不会降级。
+- 一旦上游发布高于本改版的版本（例如 `2.3.0`），应用内升级会**把上游包覆盖到本改版的目录里**——
+  包名变回 `dsh-our-free-model`，与 `dsh.profile.bundles` 里写的 `dsh-our-free-model-fish` 失配，
+  启动即报找不到 bundle。**本改版的升级请一律走 npm，不要点应用内的升级按钮。**
+
+上游的 issue、PR、讨论与 Star 都请提交到[上游仓库](https://github.com/Ebony-Vinyl/dsh-our-free-model)；
+只有本改版自身引入的问题才提到本仓库。
 
 ---
 
@@ -115,7 +160,7 @@ Chat Completions、Responses API，以及独立网页管理（模型、统计、
 **命令行（纯 dsh web）**
 
 ```
-dsh plugin --profile web add /绝对路径/dsh-our-free-model
+dsh plugin --profile web add /绝对路径/dsh-our-free-model-fish
 ```
 
 安装完成后重启应用一次。`--profile` 填写实际使用的 profile 名称。
@@ -135,10 +180,10 @@ PROFILE_UPGRADE_REQUIRED: offline dependency migration is not yet available
 
 以真实目录手工安装时，在 /profiles// 下完成三项操作：
 
-1. 将发布文件复制至 node_modules/dsh-our-free-model/
+1. 将发布文件复制至 node_modules/dsh-our-free-model-fish/
 （index.js、client.js、adapter/、src/、locale/、icon.svg、cordis.patch.yml、package.json——adapter/ 不可遗漏：index.js 首行即 import 该目录）
-2. 在 dependencies 中加入 "dsh-our-free-model": "2.1.0"——该版本号跟随仓库 package.json 的 version（版本变更时同步，当前为 2.1.0），不要沿用旧值，也不要写为 link:
-3. 在 dsh.profile.bundles 末尾追加 "dsh-our-free-model"
+2. 在 dependencies 中加入 "dsh-our-free-model-fish": "2.2.0"——该版本号跟随仓库 package.json 的 version（版本变更时同步，当前为 2.2.0），不要沿用旧值，也不要写为 link:
+3. 在 dsh.profile.bundles 末尾追加 "dsh-our-free-model-fish"
 
 不要再向 cordis.patch.yml 添加条目。被 dsh.profile.bundles 引用的包，其自带的
 patch 层会自动生效；两处同时注册将报错 duplicate loader entry id: our-free-model。
@@ -689,12 +734,28 @@ DeepSeek Harness 桌面端（Electron 壳）：内核自身提供的 desktop pro
 
 ## 许可证
 
-MIT，见 LICENSE。
+MIT，见 LICENSE。**本改版沿用上游的 MIT 许可，未对任何代码重新授权**；原始版权归上游作者
+Ebony-Vinyl（`Copyright (c) 2026 Ebony-Vinyl`）及其贡献者所有。
 
 本项目为独立插件，与任何模型提供方无隶属、认可或赞助关系。使用该插件访问免费额度受各提供方
 自身条款约束；在超出个人机器的场景中部署前，请先确认这些条款。
 
-## Star 趋势
+## 致谢与来源
+
+- **上游项目**：[Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model)
+  ——本改版的代码基础、界面、文档与发布流程均来自这里。若这个插件对你有帮助，请把 Star 与
+  支持给到上游仓库，而不是本 fork。
+- **上游贡献者**：上游仓库的提交历史里记录了全部贡献者（包括 `zixin947`、`Nefert`、
+  `maxiaochao-574`、`流影似景` 等），他们的工作原样保留在本改版中。
+- **渠道包**：`vendor/channel-pack/` 来自上游转售的第三方渠道包，来源与许可见
+  `vendor/channel-pack/NOTICE.md`，本改版未作修改。
+- **本改版的改动**：仅 `src/image-pricing.js`、`src/channel-visibility.js`、公告渲染与包名/发布
+  身份相关的部分，详见[这是什么](#这是什么)。
+
+## Star 趋势（上游仓库）
+
+下图统计的是**上游仓库** `Ebony-Vinyl/dsh-our-free-model` 的 Star 增长，与本 fork 无关，
+在此保留只为如实反映项目的真实来源。
 
 图表由 Star History 自动更新，无需手动提交图片。受服务缓存（当前为 24 小时）和 GitHub 图片缓存影响，显示可能延迟，并非秒级实时；点击图表可查看在线趋势。
 

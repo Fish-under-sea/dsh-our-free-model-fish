@@ -1,11 +1,12 @@
 <div align="center">
   <img src="icon.svg" alt="Our Free Model — free model provider plugin for DeepSeek Harness" width="120">
 
-# dsh-our-free-model
+# dsh-our-free-model-fish
 
 [简体中文](README.md) | **English**
 
   <img alt="license" src="https://img.shields.io/badge/license-MIT-263146?style=flat-square">
+  <a href="https://github.com/Ebony-Vinyl/dsh-our-free-model"><img alt="community fork of Ebony-Vinyl/dsh-our-free-model" src="https://img.shields.io/badge/fork%20of-Ebony--Vinyl%2Fdsh--our--free--model-6b4b9e?style=flat-square"></a>
   <img alt="zero dependencies" src="https://img.shields.io/badge/dependencies-zero-4b6fff?style=flat-square">
   <img alt="build step" src="https://img.shields.io/badge/build%20step-none-7da1de?style=flat-square">
   <img alt="dsh kernels" src="https://img.shields.io/badge/dsh-0.1.5--0.1.7--rc.2-2f6f4f?style=flat-square">
@@ -15,6 +16,16 @@
   <a href="https://trendshift.io/repositories/261203"><img alt="GITHUB TRENDING #2, Repository Of The Week" src="docs/images/trendshift-weekly-laurel-purple.svg" width="250" height="55"></a>
 
 </div>
+
+> **This is a community fork of an existing project, not an original work.** This
+> repository forks [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model):
+> the code, the UI, the docs and the release pipeline are almost entirely the work of
+> the upstream author Ebony-Vinyl and its contributors, and this fork only layers
+> incremental changes on top of it. It is published to npm under the package name
+> `dsh-our-free-model-fish` so as not to take over upstream's package name. The badges
+> and trending ranks above, and the star chart at the end, all belong to the
+> **upstream repository**. For the itemised differences, see
+> [What this is](#what-this-is).
 
 <div align="center">
 
@@ -32,6 +43,54 @@
 > It mounts as a pure plugin: no core changes, no build step, zero dependencies.
 
 </div>
+
+---
+
+## What this is
+
+**This repository is a community fork of
+[Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model), not an original
+project.** The upstream author is Ebony-Vinyl; the plugin's capabilities, its UI and almost all of
+its code are the work of upstream and its contributors. This fork layers a handful of changes on
+top and publishes under **its own npm package name** `dsh-our-free-model-fish`, so as not to take
+over upstream's `dsh-our-free-model`.
+
+| | Upstream `dsh-our-free-model` | This fork `dsh-our-free-model-fish` |
+| --- | --- | --- |
+| Repository | [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model) | [Fish-under-sea/dsh-our-free-model-fish](https://github.com/Fish-under-sea/dsh-our-free-model-fish) |
+| npm package | `dsh-our-free-model` | `dsh-our-free-model-fish` |
+| Maintainer | Ebony-Vinyl and upstream contributors | Fish-under-sea (this fork only) |
+| Trending / stars | Belong to the upstream repository | Not attributable to this fork |
+
+What this fork adds over upstream, as of `2.2.0`:
+
+- **Area-based pricing for the free lane** (`src/image-pricing.js`) — when a provider publishes no
+  vision-pricing protocol, visual tokens are estimated from the image's real pixel area instead of
+  upstream's flat 1024 fallback; images already moved out of the request count as description text only.
+- **A master switch for channel-catalog visibility** (`src/channel-visibility.js`) — the channel
+  pack's 13 provider groups can be collapsed in one move rather than model by model, and remote
+  additions cannot sneak a group back in.
+- **Announcements rendered into `body`, with keyboard access fixed** — announcement rendering and
+  focus order were reworked to meet accessibility requirements.
+- **Independent package name and publishing identity** — `dsh-our-free-model-fish`. The row id and
+  the data directory are still `our-free-model`, so **switching from upstream loses no settings**
+  (they stay in `$DSH_HOME/our-free-model/`).
+- The upstream `package.json`'s `private` flag is dropped, which is what makes npm installation possible.
+
+Upstream's release signing key is not on this machine, so this fork **does not publish a self-upgrade
+manifest** (`feed/manifest.json` and `catalog/integrity.json` keep upstream's signature and are not
+refreshed here). Two consequences:
+
+- The in-app "check for updates" still reads upstream `2.1.0`, which is below this fork's `2.2.0`, so it
+  **offers nothing** — and cannot downgrade you.
+- Once upstream ships a version above this fork's (say `2.3.0`), the in-app upgrade would **overwrite
+  this fork's directory with the upstream package** — the package name reverts to `dsh-our-free-model`,
+  no longer matches `dsh-our-free-model-fish` in `dsh.profile.bundles`, and startup fails with a missing
+  bundle. **Upgrade this fork through npm only; do not press the in-app upgrade button.**
+
+Please file upstream's issues, PRs, discussions and stars with the
+[upstream repository](https://github.com/Ebony-Vinyl/dsh-our-free-model); only problems this fork
+introduces belong here.
 
 ---
 
@@ -89,7 +148,7 @@ the picker by itself as soon as a probe gets through.
 ### Command line (plain `dsh web`)
 
 ```bash
-dsh plugin --profile web add /absolute/path/to/dsh-our-free-model
+dsh plugin --profile web add /absolute/path/to/dsh-our-free-model-fish
 ```
 
 Restart the app once. `--profile` should name the profile you actually use.
@@ -110,10 +169,10 @@ create a junction.** Use the in-app plugin manager, or place a real directory.
 
 To install manually as a real directory, in `<DSH_HOME>/profiles/<profile>/`:
 
-1. Copy the published files into `node_modules/dsh-our-free-model/`
+1. Copy the published files into `node_modules/dsh-our-free-model-fish/`
    (`index.js`, `client.js`, `adapter/`, `src/`, `locale/`, `icon.svg`, `cordis.patch.yml`, `package.json` — do not skip `adapter/`: `index.js` imports it on the first line)
-2. Add `"dsh-our-free-model": "2.1.0"` to `dependencies` — that number **tracks the repo's `package.json` `version`** (bump it together; 2.1.0 as of this line), never copy a stale one, and a version spec, not `link:`
-3. Append `"dsh-our-free-model"` to `dsh.profile.bundles`
+2. Add `"dsh-our-free-model-fish": "2.2.0"` to `dependencies` — that number **tracks the repo's `package.json` `version`** (bump it together; 2.2.0 as of this line), never copy a stale one, and a version spec, not `link:`
+3. Append `"dsh-our-free-model-fish"` to `dsh.profile.bundles`
 
 > Do **not** also add an entry to `cordis.patch.yml`. A bundle referenced from
 > `dsh.profile.bundles` already applies its own patch layer, and registering it
@@ -767,8 +826,28 @@ On privacy and trust, plainly:
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+MIT — see [LICENSE](LICENSE). **This fork keeps upstream's MIT license and relicenses nothing**;
+the original copyright belongs to the upstream author Ebony-Vinyl (`Copyright (c) 2026 Ebony-Vinyl`)
+and its contributors.
 
 This project is an independent plugin and is not affiliated with, endorsed by, or
 sponsored by any model provider. Using it to reach free tiers is subject to those
 providers' own terms; check them before deploying anywhere beyond your own machine.
+
+## Credits and provenance
+
+- **Upstream project**: [Ebony-Vinyl/dsh-our-free-model](https://github.com/Ebony-Vinyl/dsh-our-free-model)
+  — the code base, UI, docs and release pipeline of this fork all come from there. If this plugin
+  helps you, send the star and the credit to the upstream repository, not to this fork.
+- **Upstream contributors**: the upstream history records every one of them (`zixin947`, `Nefert`,
+  `maxiaochao-574`, `流影似景` among others); their work is carried over here unchanged.
+- **Channel pack**: `vendor/channel-pack/` is the third-party channel pack upstream redistributes;
+  its origin and licensing are in `vendor/channel-pack/NOTICE.md`, and this fork does not modify it.
+- **What this fork changed**: only `src/image-pricing.js`, `src/channel-visibility.js`, the
+  announcement rendering, and the package name / publishing identity — see
+  [What this is](#what-this-is).
+
+## Star history (upstream)
+
+The chart below tracks **the upstream repository** `Ebony-Vinyl/dsh-our-free-model`. It is unrelated
+to this fork and is kept here only so the project's real provenance stays visible.
